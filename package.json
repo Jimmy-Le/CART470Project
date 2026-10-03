@@ -1,0 +1,26 @@
+{
+  "name": "cart470project",
+  "version": "1.0.0",
+  "description": "A wonderful project with a wonderful team",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev --prefix interactive-map-app\" \"npm run dev --prefix server\"",
+    "setup": "npm install && npm install --prefix interactive-map-app && npm install --prefix server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jimmy-Le/CART470Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Jimmy-Le/CART470Project/issues"
+  },
+  "homepage": "https://github.com/Jimmy-Le/CART470Project#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}
