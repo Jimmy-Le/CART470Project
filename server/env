@@ -1,0 +1,3 @@
+MONGODB_URI=mongodb+srv://Testing:Test123@interactivemap.nfwuegw.mongodb.net/TestDatabase?retryWrites=true&w=majority
+PORT=3001
+
