@@ -13,6 +13,17 @@ const Canvas = props => {
         //drawing
         context.fillStyle = '#3465ea'
         context.fillRect(0,0,context.canvas.width, context.canvas.height)
+
+        //drawing a line
+        context.fillStyle = 'none'
+        //define new path
+        context.beginPath();
+        //set a start point
+        context.moveTo(0,0);
+        //set an end point
+        context.lineTo(200,100);
+        //do the drawing
+        context.stroke();
     },[])
 
 
