@@ -2,7 +2,7 @@
 
 
 /*Making the font Montserrat for everything lol*/
- p, a{
+ p, a, button{
   font-family: "Montserrat", sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
