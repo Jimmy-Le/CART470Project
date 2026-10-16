@@ -195,14 +195,12 @@
   text-align: center;
 }
 
-.informationBox {
-  background-color: aqua;
-  width: 200px;
-}
 
 .textBox {
   text-align: left;
   background-color: beige;
-  border-radius: 2em;
-  padding: 1em;
+  border-radius: 1em;
+  padding: 0.5em 1em 1em 1em;
+  color: black;
+  font-size: medium;
 }
