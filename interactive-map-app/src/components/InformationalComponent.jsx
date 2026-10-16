@@ -5,7 +5,7 @@ import "../App.css";
 function InformationalComponent() {
 
   // The variable and Setter function. useState([Default Value])
-  const [title] = useState(["Polution"]);
+  const [title] = useState(["Pollution"]);
 
   // Example: Timers, Fetching Data from the database, subscribing to events. This is optional, feel free to remove.
   useEffect(() => {
@@ -15,10 +15,10 @@ function InformationalComponent() {
   // Put HTML in here. Whatever is in here will render on screen when the component is called.
   // Variables are called using {variable_name}
   return (
-      <div className="informationBox">
-          <div className="horizontal center bg-blue-500">
+      <div className="w-75">
+          <div className="horizontal center">
             <img src={reactImg} width="25" height="25"></img>
-            <p>{title} </p>
+            <p className="p-1 underline">{title} </p>
           </div>
           <div className="textBox">
             <p>
