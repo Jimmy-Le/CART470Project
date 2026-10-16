@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
@@ -181,4 +183,24 @@
     right: 0;
     border-right-color: var(--border);
   }
+}
+
+.horizontal{
+  display: flex;
+  flex-direction: row;
+}
+
+.center{
+  justify-content: center;
+  text-align: center;
+}
+
+
+.textBox {
+  text-align: left;
+  background-color: beige;
+  border-radius: 1em;
+  padding: 0.5em 1em 1em 1em;
+  color: black;
+  font-size: medium;
 }
