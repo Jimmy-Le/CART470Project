@@ -25,7 +25,7 @@ function ZoomButtons() {
   // Put HTML in here. Whatever is in here will render on screen when the component is called.
   // Variables are called using {variable_name}
   return (
-      <div class="fixed right-1/10 bottom-1/6 flex flex-col gap-2">
+      <div class="fixed right-1/12 bottom-1/6 flex flex-col gap-2">
           <button onClick={zoomIn} class="bg-black hover:bg-gray-700 w-10 rounded-md  text-white text-bold text-4xl "> + </button>
           <button onClick={zoomOut} class="bg-black hover:bg-gray-700 w-10 rounded-md  text-white text-bold text-4xl"> - </button>
       </div>
