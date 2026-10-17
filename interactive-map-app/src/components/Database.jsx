@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import reactImg from '../assets/react.svg';
+import "../App.css"
 
 function TaskList() {
   const [tasks, setTasks] = useState([]);
