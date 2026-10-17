@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+
+/*Making the font Montserrat for everything lol*/
+ p, a, button{
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+h1,h2{
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: bold;
+  font-style: normal;
+}
+
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
