@@ -3,7 +3,8 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 // import App from './App.jsx'
 import TaskList from './components/Database.jsx'
-import InformationalComponent from './components/InformationalComponent.jsx'
+import IslandComponent from './components/IslandComponent.jsx'
+
 //getting my connections stuff
 import Canvas from './components/connectionLines.jsx'
 
@@ -12,6 +13,6 @@ createRoot(document.getElementById('root')).render(
     {/* <App /> */}
     <TaskList />
     <Canvas />
-    <InformationalComponent />
+    <IslandComponent />
   </StrictMode>,
 )
