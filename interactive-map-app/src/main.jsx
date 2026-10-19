@@ -5,6 +5,7 @@ import './index.css'
 import TaskList from './components/Database.jsx'
 import IslandPreview from "./components/IslandPreview.jsx"
 import IslandComponent from "./components/IslandComponent.jsx"
+import IslandList from "./components/IslandList.jsx"
 
 //getting my connections stuff
 import Canvas from './components/connectionLines.jsx'
@@ -16,10 +17,13 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     {/* <App /> */}
     {/*<TaskList /> */}
-    <IslandInformation />
+    <IslandList/>
+    <IslandPreview />
    <IslandComponent/>
+   
     
     <ZoomButtons />
-    <IslandPreview />
+   
+    <IslandInformation />
   </StrictMode>,
 )
