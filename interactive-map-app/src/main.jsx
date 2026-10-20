@@ -18,13 +18,17 @@ import Admin from './pages/Admin.jsx';
 
 //for the disappearing components stuff
 
+/***
+ * To add a new "Page"
+ * add a new route, inside the <Routes> tag
+ * Template:
+ * <Route path="/[PATHNAME]" element={<[PAGECOMPONENT] />} />
+ * 
+ * In App.jsx, add the new path to the navigation bar if you wish.
+ */
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>    
-    {/* <IslandList/>
-    <IslandPreview/>
-    <IslandComponent/>
-    <ZoomButtons />
-    <IslandInformation /> */}
 
     <BrowserRouter>
       <Routes>
