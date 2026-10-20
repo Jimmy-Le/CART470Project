@@ -6,6 +6,8 @@ import {useRef } from "react";
 function IslandComponent() {
   const audio = useRef(null)
 
+  
+
   function playAudio()
   {
     if(!audio.current)
@@ -24,13 +26,27 @@ function IslandComponent() {
     }
   }
 
+  function togglePreview()
+  {
+    let islandPreviewClass = document.getElementById("focusedJustIsland")
+    if(islandPreviewClass.style.display == "none"){
+      islandPreviewClass.style.display = "flex";
+    }
+    else{
+      islandPreviewClass.style.display = "none";
+    }
+  }
+
   return (
       <div>
-        <a className="island-blue" onMouseEnter={playAudio} onMouseLeave={pauseAudio} href="https://wastescapes.com/as-the-gull-flies/"> 
+        
+        <a className="island-blue" onMouseEnter={playAudio} onMouseLeave={pauseAudio} onClick={togglePreview}> {/*href="https://wastescapes.com/as-the-gull-flies/"*/}
           <img src={island} alt="blue watercolor painting"/> 
         </a>
         <audio id="hoverAudio" src={sound} loop></audio>
+        <div id="focusedJustIsland"></div>
       </div>
+      
   );
 }
 

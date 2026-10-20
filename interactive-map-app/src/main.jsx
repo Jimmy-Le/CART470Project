@@ -12,14 +12,19 @@ import Canvas from './components/connectionLines.jsx'
 import IslandInformation from './components/ComponentIslandInformation.jsx'
 import ZoomButtons from './components/ComponentZoomButtons.jsx'
 
+//for the disappearing components stuff
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     {/* <App /> */}
     {/*<TaskList /> */}
+    
+    
     <IslandList/>
-    <IslandPreview />
-   <IslandComponent/>
+    <div class="focusedIsland">
+    <IslandPreview/>
+    <IslandComponent/>
+    </div>
    
     
     <ZoomButtons />
