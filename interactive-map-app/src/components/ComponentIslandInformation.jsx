@@ -19,7 +19,7 @@ function IslandInformation() {
   // Put HTML in here. Whatever is in here will render on screen when the component is called.
   // Variables are called using {variable_name}
   return (
-      <div class="w-1/3 min-w-75">
+      <div class="w-1/3 min-w-75 fixed bottom-0">
           <h2 class="pt-5 font-900">
              {title} 
           </h2>

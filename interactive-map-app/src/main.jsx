@@ -21,10 +21,11 @@ createRoot(document.getElementById('root')).render(
     
     
     <IslandList/>
-    <div class="focusedIsland">
+  
     <IslandPreview/>
     <IslandComponent/>
-    </div>
+      
+  
    
     
     <ZoomButtons />

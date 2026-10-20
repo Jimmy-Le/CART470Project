@@ -38,7 +38,7 @@ function IslandComponent() {
   }
 
   return (
-      <div>
+      <div className="fixed top-1/3 place-self-center">
         
         <a className="island-blue" onMouseEnter={playAudio} onMouseLeave={pauseAudio} onClick={togglePreview}> {/*href="https://wastescapes.com/as-the-gull-flies/"*/}
           <img src={island} alt="blue watercolor painting"/> 
