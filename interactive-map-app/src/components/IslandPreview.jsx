@@ -23,7 +23,7 @@ function IslandPreview() {
   ]
 
   return (
-      <div className="bg-amber-100 rounded-xl w-75 flex flex-col justify-center pb-3">
+      <div id="focusedJustIsland" className="bg-amber-100 rounded-xl w-75 flex flex-col justify-center pb-3 z-10">
           <p className="p-1 text-black font-bold">{title}</p>
           <ul className="flex flex-row space-x-3 justify-center">
             {tags.map((tag) => (
@@ -41,7 +41,7 @@ function IslandPreview() {
           </ul>
           <hr className="my-3 mt-10" />
           <a href="" className="text-orange-400 ">More Details</a>
-      </div>
+      </div>   
   );
 }
 

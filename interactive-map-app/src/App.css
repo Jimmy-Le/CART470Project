@@ -240,3 +240,9 @@ h1,h2{
       transform: scale(1.08);
       filter: brightness(1.3);
     }
+
+    #focusedJustIsland{
+      display:none;
+      margin: 0 auto;
+      margin-top: 10px;
+    }
