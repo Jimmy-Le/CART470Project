@@ -4,24 +4,47 @@ import { useEffect, useState } from "react";
 function ZoomButtons() {
 
   // // The variable and Setter function. useState([Default Value])
-  const [zoomPercentage, setZoomPercentage] = useState([100]);
+  const [zoomPercentage, setZoomPercentage] = useState(100);
 
   //might need to use this to actually make the zoom stuff work?
   // Example: Timers, Fetching Data from the database, subscribing to events. This is optional, feel free to remove.
   useEffect(() => {
   }, []);
 
-  // You can make functions inside of here
-  function zoomIn(){
-    setZoomPercentage(parseInt(zoomPercentage) + 10);
-    console.log("you are at "+ zoomPercentage + "%")
-  };
+  useEffect(() => {
+   const islandContainer = document.querySelector(".island-blue");
+   if (islandContainer) {
+      islandContainer.style.transform= "scale(" + zoomPercentage/100 + ")"
+    }
+  }, [zoomPercentage]);
 
-  function zoomOut(){
-    setZoomPercentage(parseInt(zoomPercentage) - 10);
-    console.log("you are at "+ zoomPercentage + "%")
+  function zoomIn() {
+    if(zoomPercentage < 300)
+    setZoomPercentage(parseInt(zoomPercentage) + 10);
   }
 
+  function zoomOut() {
+    if(zoomPercentage > 10){
+      setZoomPercentage(parseInt(zoomPercentage) - 10);
+    }
+  }
+
+  // // You can make functions inside of here
+  // function zoomIn(){
+  //   setZoomPercentage(parseInt(zoomPercentage) + 10);
+  //   console.log("you are at "+ zoomPercentage + "%")
+  //   let islandContainer = document.querySelector(".island-blue")
+  //   islandContainer.style.transform= "scale(" + zoomPercentage/100 + ")"
+  // };
+
+  // function zoomOut(){
+  //   setZoomPercentage(parseInt(zoomPercentage) - 10);
+  //   console.log("you are at "+ zoomPercentage + "%")
+  //   let islandContainer = document.querySelector(".island-blue")
+  //   islandContainer.style.transform= "scale(" + zoomPercentage/100 + ")"
+  // }
+
+  
   // Put HTML in here. Whatever is in here will render on screen when the component is called.
   // Variables are called using {variable_name}
   return (
