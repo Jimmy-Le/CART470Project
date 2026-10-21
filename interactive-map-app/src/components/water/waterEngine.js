@@ -1532,6 +1532,112 @@ const observer = new ResizeObserver(resize);
 observer.observe(root);
 observer.observe(root.querySelector('.controls'));
 frameId = requestAnimationFrame(frame);
+// ↑ ↑ ↓ ↓ ← → ← → B A
+// max 10s between first and last key, max 5s between any two keys.
+const panelSequence = [
+  'ArrowUp', 'ArrowUp',
+  'ArrowDown', 'ArrowDown',
+  'ArrowLeft', 'ArrowRight',
+  'ArrowLeft', 'ArrowRight',
+  'KeyB', 'KeyA'
+];
+
+let panelKeyHistory = [];
+let panelControlsHidden = false;
+
+window.addEventListener('keydown', (event) => {
+  if (
+    event.repeat ||
+    event.ctrlKey ||
+    event.altKey ||
+    event.metaKey
+  ) {
+    return;
+  }
+
+  // when typing in a text field, reset the key history to avoid accidentally revealing the panel.
+  const target = event.target;
+  const typingText =
+    target?.isContentEditable ||
+    target?.tagName === 'TEXTAREA' ||
+    (
+      target?.tagName === 'INPUT' &&
+      !['range', 'checkbox', 'radio', 'button', 'submit']
+        .includes(target.type)
+    );
+
+  if (typingText) {
+    panelKeyHistory = [];
+    return;
+  }
+
+  const now = performance.now();
+
+  if (panelKeyHistory.length) {
+    const first = panelKeyHistory[0];
+    const last = panelKeyHistory[panelKeyHistory.length - 1];
+
+    if (
+      now - first.time > 10000 ||
+      now - last.time > 5000
+    ) {
+      panelKeyHistory = [];
+    }
+  }
+
+  // event.code 
+  const key = event.code || (
+    event.key.toLowerCase() === 'b' ? 'KeyB' :
+    event.key.toLowerCase() === 'a' ? 'KeyA' :
+    event.key
+  );
+
+  panelKeyHistory.push({ key, time: now });
+
+  // when the sequence is broken, remove the earliest key until the history matches the expected sequence.
+  while (
+    panelKeyHistory.length &&
+    !panelKeyHistory.every(
+      (item, index) => item.key === panelSequence[index]
+    )
+  ) {
+    panelKeyHistory.shift();
+  }
+
+  // avoid scrolling the page when using arrow keys to reveal the panel.
+  if (
+    panelKeyHistory.length &&
+    key.startsWith('Arrow')
+  ) {
+    event.preventDefault();
+  }
+
+  if (panelKeyHistory.length !== panelSequence.length) return;
+
+  panelKeyHistory = [];
+
+  const panel = root.querySelector('.controls');
+  if (!panel) return;
+
+  panelControlsHidden = !panelControlsHidden;
+
+  // when the panel is hidden, remove focus from any element inside it to prevent accidental interaction.
+  if (panelControlsHidden) {
+    if (panel.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
+
+    panel.style.setProperty('visibility', 'hidden', 'important');
+    panel.style.setProperty('pointer-events', 'none', 'important');
+    panel.inert = true;
+    panel.setAttribute('aria-hidden', 'true');
+  } else {
+    panel.style.removeProperty('visibility');
+    panel.style.removeProperty('pointer-events');
+    panel.inert = false;
+    panel.removeAttribute('aria-hidden');
+  }
+}, { capture: true, signal });
 return {
   focusIsland,
   hideName() {
