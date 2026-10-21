@@ -1,3 +1,21 @@
+@import "tailwindcss";
+
+
+/*Making the font Montserrat for everything lol*/
+ p, a, button{
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+h1,h2{
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: bold;
+  font-style: normal;
+}
+
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
@@ -182,3 +200,49 @@
     border-right-color: var(--border);
   }
 }
+
+.horizontal{
+  display: flex;
+  flex-direction: row;
+}
+
+.center{
+  justify-content: center;
+  text-align: center;
+}
+
+
+.textBox {
+  text-align: left;
+  background-color: beige;
+  border-radius: 1em;
+  padding: 0.5em 1em 1em 1em;
+  color: black;
+  font-size: medium;
+}
+
+/* Island Component Css */
+    .island-blue {
+      display: inline-block;
+      overflow: hidden;
+      border-radius: 15px;
+    }
+
+    .island-blue img {
+      display: block;
+      width: 300px;
+      max-width: 100%;
+      transition: transform 0.3s ease, filter 0.3s ease;
+      cursor: pointer;
+    }
+
+    .island-blue:hover img {
+      transform: scale(1.08);
+      filter: brightness(1.3);
+    }
+
+    #focusedJustIsland{
+      display:none;
+      margin: 0 auto;
+      margin-top: 10px;
+    }
