@@ -1,21 +1,13 @@
-
-function IslandList() {
-
-  const islands = [
-    {id: 'i1', name:"Ile Deslauriers"},
-    {id: 'i2', name:"Ile Sainte-Helene"},
-    {id: 'i3', name:"Ile Notre-Dame"}
-  ];
-
-
-  return (
-      <ul className="bg-[#777f8f] w-50 rounded-md p-5 flex flex-col" >
-          {islands.map((island) => (
-            <li key ={island.id} className="text-left pl-5 text-[#000000]"> {island.name} </li>
-          ))}
-      </ul>
-  );
+const islands = [
+  { id: 'i1', name: 'Ile Deslauriers' },
+  { id: 'i2', name: 'Ile Sainte-Helene' },
+  { id: 'i3', name: 'Ile Notre-Dame' },
+];
+export default function IslandList({ activeIsland, onSelect }) {
+  return <ul className="team-island-list-items">
+    {islands.map(island => <li key={island.id}>
+      <button type="button" aria-pressed={activeIsland === island.id}
+        onClick={() => onSelect?.(island.id, island.name)}>{island.name}</button>
+    </li>)}
+  </ul>;
 }
-
-// Export using the same name as the Function name.
-export default IslandList;

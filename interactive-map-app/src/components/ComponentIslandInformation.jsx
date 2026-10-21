@@ -4,7 +4,7 @@ import "../App.css";
 function IslandInformation() {
 
   // The variable and Setter function. useState([Default Value])
-  const [title, setTitle] = useState(["This is the Title"]);
+  const [title, setTitle] = useState(["Île Deslauriers — Seagull Island"]);
   const [description, setDescription] = useState(["Île Deslauriers is a small island in the Saint Lawrence River just east of Montreal that is famous for hosting one of the largest breeding colonies of ring-billed gulls in North America."]);
 
   // Example: Timers, Fetching Data from the database, subscribing to events. This is optional, feel free to remove.
@@ -19,14 +19,14 @@ function IslandInformation() {
   // Put HTML in here. Whatever is in here will render on screen when the component is called.
   // Variables are called using {variable_name}
   return (
-      <div className="w-1/3 min-w-75 fixed bottom-0 bg-amber-50 rounded-2xl">
+      <section id="island-information" className="team-island-information bg-amber-50 rounded-2xl">
           <h2 className="pt-5 font-900 ">
              {title} 
           </h2>
           <p className="text-left p-5 pt-1 text-black text-sm">
             {description}
           </p>
-      </div>
+      </section>
   );
 }
 

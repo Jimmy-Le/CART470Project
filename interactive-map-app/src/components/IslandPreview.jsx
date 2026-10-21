@@ -5,7 +5,7 @@ import IslandThumbnail from "./IslandThumbnail.jsx";
 import blueIsland from "../assets/blue.png";
 import testIsland from "../assets/TestIsland.png";
 
-function IslandPreview() {
+function IslandPreview({ onClose }) {
 
   const title = "Seagull Island";
 
@@ -23,7 +23,8 @@ function IslandPreview() {
   ]
 
   return (
-      <div id="focusedJustIsland" className="bg-amber-100 rounded-xl w-75 flex flex-col justify-center pb-3 z-10">
+      <div className="team-preview-card bg-amber-100 rounded-xl w-75 flex flex-col justify-center pb-3 z-10">
+          <button type="button" className="team-preview-close" aria-label="Close island preview" onClick={onClose}>×</button>
           <p className="p-1 text-black font-bold">{title}</p>
           <ul className="flex flex-row space-x-3 justify-center">
             {tags.map((tag) => (
@@ -40,7 +41,7 @@ function IslandPreview() {
             ))}
           </ul>
           <hr className="my-3 mt-10" />
-          <a href="" className="text-orange-400 ">More Details</a>
+          <a href="#island-information" className="text-orange-400 ">More Details</a>
       </div>   
   );
 }
