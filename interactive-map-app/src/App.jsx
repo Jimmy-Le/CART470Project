@@ -17,6 +17,7 @@ function App() {
       <nav className='space-x-5'>
         <NavLink to="/">Home</NavLink>
         <NavLink to="/admin">Admin</NavLink>
+        <NavLink to="/Lines">Lines</NavLink>
       </nav>
 
       <Outlet />
