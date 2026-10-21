@@ -29,22 +29,7 @@ function ZoomButtons() {
     }
   }
 
-  // // You can make functions inside of here
-  // function zoomIn(){
-  //   setZoomPercentage(parseInt(zoomPercentage) + 10);
-  //   console.log("you are at "+ zoomPercentage + "%")
-  //   let islandContainer = document.querySelector(".island-blue")
-  //   islandContainer.style.transform= "scale(" + zoomPercentage/100 + ")"
-  // };
 
-  // function zoomOut(){
-  //   setZoomPercentage(parseInt(zoomPercentage) - 10);
-  //   console.log("you are at "+ zoomPercentage + "%")
-  //   let islandContainer = document.querySelector(".island-blue")
-  //   islandContainer.style.transform= "scale(" + zoomPercentage/100 + ")"
-  // }
-
-  
   // Put HTML in here. Whatever is in here will render on screen when the component is called.
   // Variables are called using {variable_name}
   return (
