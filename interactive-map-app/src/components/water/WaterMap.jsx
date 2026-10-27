@@ -1,47 +1,31 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
-import blueIsland from '../../assets/blue.png';
-import gullSound from '../../assets/audio/seagulls.mp3';
-import template from './waterMap.html?raw';
-import { createWaterMap } from './waterEngine.js';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { defaultIslands } from './data/islands.js';
+import WaterIsland from './WaterIsland.jsx';
+import IslandName from './IslandName.jsx';
+import CurrentControls from './CurrentControls.jsx';
+import useWaterEngine from './hooks/useWaterEngine.js';
 import './WaterMap.css';
 
-const WaterMap = forwardRef(function WaterMap({ onSelect, zoom }, ref) {
+const WaterMap = forwardRef(function WaterMap({ onSelect, zoom = 1, islands = defaultIslands,
+  initialCurrents, onCurrentsChange, storageKey }, ref) {
   const host = useRef(null);
-  const engine = useRef(null);
-  const onSelectRef = useRef(onSelect);
-  useEffect(() => { onSelectRef.current = onSelect; }, [onSelect]);
-
+  const { engine, state, actions } = useWaterEngine(host, {
+    islands, initialCurrents, onSelect, onCurrentsChange, zoom, storageKey,
+  });
   useImperativeHandle(ref, () => ({
-    focusIsland: () => engine.current?.focusIsland(),
+    focusIsland: id => engine.current?.focusIsland(id),
     hideName: () => engine.current?.hideName(),
-  }), []);
-
-  useEffect(() => {
-    const root = host.current;
-    root.innerHTML = template.replace('__BLUE_ISLAND__', blueIsland);
-    const map = createWaterMap(root, { onSelect: () => onSelectRef.current?.() });
-    engine.current = map;
-    const audio = new Audio(gullSound);
-    audio.loop = true;
-    const abort = new AbortController();
-    const stop = () => { audio.pause(); audio.currentTime = 0; };
-    const island = root.querySelector('.island');
-    island.addEventListener('mouseenter', () => {
-      // Browsers may require a first user interaction before allowing audio.
-      audio.play().catch(() => {});
-    }, { signal: abort.signal });
-    island.addEventListener('mouseleave', stop, { signal: abort.signal });
-    return () => {
-      abort.abort();
-      stop();
-      audio.removeAttribute('src');
-      map.destroy();
-      engine.current = null;
-      root.replaceChildren();
-    };
-  }, []);
-
-  useEffect(() => { engine.current?.setZoom(zoom); }, [zoom]);
-  return <div ref={host} className="water-map-scene" aria-label="Interactive island and water-current map" />;
+    getCurrents: () => engine.current?.getCurrents() ?? [],
+    // Use after an asynchronous database read; does not trigger the save callback.
+    setCurrents: records => engine.current?.setCurrents(records),
+  }), [engine]);
+  return <div ref={host} className="water-map-scene" aria-label="Interactive island and water-current map">
+    <div className="world" id="world">
+      <canvas id="water" width="1200" height="800" aria-hidden="true" />
+      {islands.map(island => <WaterIsland key={island.id} island={island} onSelect={actions.focusIsland} />)}
+      {islands.map(island => <IslandName key={island.id} island={island} />)}
+    </div>
+    <CurrentControls state={state} actions={actions} />
+  </div>;
 });
 export default WaterMap;
