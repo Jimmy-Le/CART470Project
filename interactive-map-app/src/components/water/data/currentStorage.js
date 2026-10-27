@@ -1,6 +1,5 @@
 import defaults from './currents.json';
 
-export const DEFAULT_STORAGE_KEY = 'cart470-team-water-v1';
 const clamp = (value, min, max, fallback) => Number.isFinite(value)
   ? Math.max(min, Math.min(max, value)) : fallback;
 const point = p => p && Number.isFinite(p.x) && Number.isFinite(p.y)
@@ -25,18 +24,7 @@ export function serializeCurrents(routes) {
     id, a: { x: a.x, y: a.y }, b: { x: b.x, y: b.y }, speed, width, strength,
   }));
 }
-export function loadLocalCurrents(key = DEFAULT_STORAGE_KEY) {
-  try {
-    const raw = key ? localStorage.getItem(key) : null;
-    if (raw !== null) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return normalizeCurrents(parsed);
-    }
-  } catch { /* Invalid or unavailable storage falls back to project defaults. */ }
+// Project JSON is the shared source of truth. Ignore browser-local drafts.
+export function loadProjectCurrents() {
   return normalizeCurrents(defaults);
-}
-export function saveLocalCurrents(records, key = DEFAULT_STORAGE_KEY) {
-  if (!key) return;
-  try { localStorage.setItem(key, JSON.stringify(serializeCurrents(records))); }
-  catch { /* The editor continues to work when storage is unavailable. */ }
 }

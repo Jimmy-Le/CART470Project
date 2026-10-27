@@ -457,6 +457,13 @@ return {
   hideName,
   toggleAdd, selectCurrent, updateCurrent, reverseCurrent, deleteCurrent, togglePause, overview,
   getCurrents: () => serializeCurrents(routes),
+  importCurrents(records) {
+    loadCurrents(records);
+    rebuildField();
+    save();
+    message(`Loaded ${routes.length} currents from JSON.`);
+    return routes.length;
+  },
   setCurrents(records) {
     loadCurrents(records);
     rebuildField();

@@ -1,3 +1,4 @@
+import CurrentFileControls from './CurrentFileControls.jsx';
 import { routeName } from './engine/routeMath.js';
 
 export function CurrentOption({ current }) {
@@ -36,5 +37,6 @@ export default function CurrentControls({ state, actions }) {
       <button type="button" disabled={!route} onClick={actions.reverseCurrent}>Reverse</button>
       <button type="button" disabled={!route} onClick={actions.deleteCurrent}>Delete</button>
     </div>
+    <CurrentFileControls actions={actions} />
   </section>;
 }

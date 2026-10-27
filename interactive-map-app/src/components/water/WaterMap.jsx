@@ -7,10 +7,10 @@ import useWaterEngine from './hooks/useWaterEngine.js';
 import './WaterMap.css';
 
 const WaterMap = forwardRef(function WaterMap({ onSelect, zoom = 1, islands = defaultIslands,
-  initialCurrents, onCurrentsChange, storageKey }, ref) {
+  initialCurrents, onCurrentsChange }, ref) {
   const host = useRef(null);
   const { engine, state, actions } = useWaterEngine(host, {
-    islands, initialCurrents, onSelect, onCurrentsChange, zoom, storageKey,
+    islands, initialCurrents, onSelect, onCurrentsChange, zoom,
   });
   useImperativeHandle(ref, () => ({
     focusIsland: id => engine.current?.focusIsland(id),
