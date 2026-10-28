@@ -1,14 +1,81 @@
-import React, {useRef, useEffect } from 'react'
 
-const Canvas = props => {
-   
+//idk why but the component template was messing up the code
+//so it is gone now
+
+//define a curve
+export default function CurvedLineOfImages({
+    start = { x: 20, y: 150 },
+    control = { x: 160, y: 0 },
+    end = { x: 300, y: 150 },
+    src = "/arrow.svg",
+    spacing = 20,
+    imgSize = 16,
+    alt = "Line icon",
+}) {
+
+        //will find a point on a quadratic bezier curve
+        //t is from 0 to 1
+        function pointAt(t){
+            const reverseT = 1-t;
+            return{
+                x: reverseT * reverseT * start.x + 2 * reverseT * t * control.x + t * t * end.x,
+                y: reverseT * reverseT * start.y + 2 * reverseT * t * control.y + t * t * end.y,
+            }
+        }
+
+     //how many steps until next image is placed
+     const steps = 200;
+     //map of point locations (where each image is placed)
+     const items = []
+
+     //keeps track of how far we've travelled on the line
+     let travelled = 0;
+     //keeps track of where the next image goes
+     let nextMark = 0;
 
 
-    return <canvas ref={canvasRef} {...props}/>
+     for (let i = 0; i < steps; i++){
+        const currentLocation = pointAt(i/steps);
+        const nextLocation = pointAt((i+1)/steps);
+
+        //if we have reached a spot where we need to place an image
+        if (travelled >= nextMark){
+            //add a point to the items map
+            items.push({
+                x: currentLocation.x,
+                y: currentLocation.y,
+                //gets the direction of the curve
+                angle: (Math.atan2(nextLocation.y - currentLocation.y, nextLocation.x - currentLocation.x)*180) / Math.PI,
+            });
+            //setting the next spot to put on image
+            nextMark += spacing;
+        }
+
+        travelled += Math.hypot(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
+
+     }
+
+    return <div>
+        {items.map(function (currentItem, index){
+            return (
+                <img
+                key = {index}
+                src={src}
+                width={imgSize}
+                height = {imgSize}
+                alt = {alt}
+                //affects style to place it nicely
+                style = {{
+                    position: "absolute",
+                    left: currentItem.x - imgSize/2,
+                    top: currentItem.y - imgSize / 2,
+                    transform: `rotate(${currentItem.angle}deg)`,
+                }}
+                />
+            );
+        })}
+    </div>
 }
-
-
-export default Canvas
 
 
 /// GARBAGE vvvvvvvvvvvvvvvvvvvvvvvTRY 2
