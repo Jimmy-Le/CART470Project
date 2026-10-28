@@ -1,10 +1,13 @@
+import { useId } from 'react';
 export default function ZoomButtons({ zoom = 1, onZoomChange }) {
+  const id = useId();
+  const percent = Math.round(zoom * 100);
   return <div className="team-zoom-controls" aria-label="Map zoom">
-    <button type="button" aria-label="Zoom in" disabled={zoom >= 2}
-      onClick={() => onZoomChange?.(value => Math.min(2, +(value + .1).toFixed(1)))}>+</button>
-    <output aria-label="Zoom level">{Math.round(zoom * 100)}%</output>
-    <button type="button" aria-label="Zoom out" disabled={zoom <= .7}
-      onClick={() => onZoomChange?.(value => Math.max(.7, +(value - .1).toFixed(1)))}>−</button>
+    <label htmlFor={id}>Zoom <output>{percent}%</output></label>
+    <input id={id} aria-label="Map zoom" type="range" min="70" max="200" step="1"
+      value={percent} style={{ '--zoom-fill': `${(percent - 70) / 130 * 100}%` }}
+      onChange={event => onZoomChange?.(Number(event.target.value) / 100)} />
+    <div className="zoom-scale"><span>70%</span><span>200%</span></div>
     <button type="button" className="team-zoom-reset" onClick={() => onZoomChange?.(1)}>Reset</button>
   </div>;
 }
