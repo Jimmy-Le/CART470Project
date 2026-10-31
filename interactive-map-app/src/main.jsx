@@ -34,6 +34,7 @@ createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<IslandsPage />}/>
         <Route path="/admin" element={<Admin />} />
+        <Route path="/Lines" element={<HomePage />} />
       </Routes>
     </BrowserRouter>
 
