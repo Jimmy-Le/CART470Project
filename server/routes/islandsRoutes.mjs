@@ -107,9 +107,7 @@ router.put("/:id", async (req, res) => {
 // DELETE an island
 router.delete("/:id", async (req, res) => {
 	try {
-		const deletedIsland = await Island.findOneAndDelete({
-			_id: req.params._id,
-		});
+		const deletedIsland = await Island.findByIdAndDelete(req.params.id,);
 
 		if (!deletedIsland) {
 			return res.status(404).json({ error: "Island not found" });

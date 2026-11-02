@@ -221,7 +221,7 @@ export default function Admin() {
 	async function deleteIsland(island) {
 		if (!island._id) {
 			// Row was never saved; remove it locally only.
-			setIslands((prev) => prev.filter((row) => row._id !== island._id));
+			setIslands((prev) => prev.filter((row) => row !== island));
 			return;
 		}
 
