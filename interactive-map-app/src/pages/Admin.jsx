@@ -69,6 +69,8 @@ export default function Admin() {
 		if (!response.ok) {
 			alert("Could not upload image.");
 			return;
+		} else {
+			alert("Image is Uploaded!");
 		}
 
 	}
