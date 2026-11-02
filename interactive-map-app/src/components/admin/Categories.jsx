@@ -1,21 +1,15 @@
 import { useEffect, useState } from "react";
 
-const connections = [
-  { id: "red", name: "Threats"},
-  { id: "yellow", name: "Communities"},
-  { id: "green", name: "Paths"},
-];
 
-function Categories() {
-  const [selectedConnection, setSelectedConnection] = useState("");
+function Categories({value, onChange, options}) {
 
   return (
-    <select value={selectedConnection} onChange={(event) => setSelectedConnection(event.target.value)}>
+    <select value={value} onChange={(event) => onChange(event.target.value)}>
       <option value="">Select a Category</option>
 
-      {connections.map((connection) => (
-        <option key={connection.id} value={connection.name}>
-          {connection.name}
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
         </option>
       ))}
     </select>

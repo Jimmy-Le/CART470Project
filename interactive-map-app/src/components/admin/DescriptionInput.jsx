@@ -1,14 +1,12 @@
 
 
-function DescriptionInput({ label, value, onChange, placeholder }) {
+function DescriptionInput({value, onChange}) {
   return (
-    <label className="flex flex-col gap-1">
-      {label}
+    <label className="flex flex-col gap-1 ">
       <textarea
         value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        rows={6}
+        onChange={(event) => onChange(event.target.value)}
+        rows={2}
         className="rounded-lg border border-gray-300 p-3"
       />
     </label>

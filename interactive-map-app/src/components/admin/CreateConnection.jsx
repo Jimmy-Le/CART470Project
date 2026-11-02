@@ -5,31 +5,47 @@ import NameInput from "./NameInput";
 import DescriptionInput from "./DescriptionInput";
 
 
-function CreateConnection() {
+function CreateConnection( {connection, index, islandId, language, categories, onUpdateConnection, onRemoveConnection}) {
 
   const defaultName = "New Connection";
   const [inputtedName, setName] = useState(defaultName);
   const [inputtedDescription, setDesc] = useState("");
 
-  const categories = ["Paths", "Threats", "Communities"];
+  function updateField(field, value){
+	onUpdateConnection(islandId, language, index, field, value);
+  }
 
   return (
-      <div className="flex flex-row bg-amber-100 space-x-5">
-        <div>
-          <Categories />
-          <NameInput value="" onChange={(event) => setName(event.target.value)} placeholder={defaultName}/>
-        </div>
-        {/* Description box */}
-        <div>
-          <DescriptionInput value="" onChange={(event) => setDesc(event.target.value)} placeholder={"Enter Description"}/>
-        </div>
-        {/* Delete */}
-        <div>
+      	<tr>
+			{/* Island ID */}
+			<td className="border p-2">
+				<Categories value={connection.category} options={categories} onChange={(value) => updateField("category", value)}/>
+			</td>
 
-        </div>
-          
-      </div>
-  );
+			<td className="border p-2">
+				<NameInput value={connection.name} onChange={(value)=> updateField("name", value)}/>
+			</td>
+			<td className="border p-2">
+				<DescriptionInput value={connection.description} onChange={(value)=> updateField("description", value)}/>
+			</td>
+
+			<td className="border p-2">
+				<button className="bg-red-400 rounded py-1 px-3 text-black" type="button" onClick={() => {
+						const confirmed = window.confirm(
+							"Are you sure you want to delete this connection? This cannot be undone."
+						);
+
+						if(confirmed)
+						{
+							onRemoveConnection(islandId, language, index)
+						}
+					}}>
+					Remove
+				</button>
+			</td>
+
+      	</tr>
+ 	);
 }
 
 // Export using the same name as the Function name.
