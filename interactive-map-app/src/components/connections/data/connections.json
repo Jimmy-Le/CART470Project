@@ -49,5 +49,22 @@
     "spacing": 15,
     "imgSize": 16,
     "icon": "arrow"
+  },
+  {
+    "start": {
+      "x": 329.8,
+      "y": 176.9
+    },
+    "control": {
+      "x": 457.2,
+      "y": -21.9
+    },
+    "end": {
+      "x": 815.8,
+      "y": 298.9
+    },
+    "spacing": 20,
+    "imgSize": 16,
+    "icon": "arrow"
   }
 ]
