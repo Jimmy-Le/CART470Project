@@ -13,7 +13,7 @@ function serializeLines(lines) {
   }));
 }
 
-function parseLines(text) {
+export function parseLines(text) {
   const data = JSON.parse(text);
 
   if (!Array.isArray(data)) {

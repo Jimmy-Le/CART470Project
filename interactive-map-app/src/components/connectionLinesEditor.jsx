@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import CurvedLineOfImages from "./connectionLines";
 import arrow from "../assets/arrow.svg";
-import ConnectionFileControls from "./ConnectionFileControls.jsx";
+import ConnectionFileControls, { parseLines } from "./ConnectionFileControls.jsx";
+import defaultConnections from "./connections/data/connections.json";
 
 
 function ConnectionsEditor() {
 
   // The variable and Setter function. useState([Default Value])
-  const [lines, setLines] = useState([]);
+  const [lines, setLines] = useState(() => {
+    try {
+      return parseLines(JSON.stringify(defaultConnections));
+    } catch (error) {
+      console.error("Could not load project connections.json:", error);
+      return [];
+    }
+  });
 
   // You can make functions inside of here
   function addLine(event){
