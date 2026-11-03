@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './index.css'
 import App from './App.jsx'
 
@@ -15,6 +15,7 @@ import ZoomButtons from './components/ComponentZoomButtons.jsx'
 import HomePage from './pages/HomePage.jsx';
 import IslandsPage from './pages/IslandsPage.jsx';
 import Admin from './pages/Admin.jsx';
+import Opening from './pages/Opening.jsx';
 
 //for the disappearing components stuff
 
@@ -28,11 +29,12 @@ import Admin from './pages/Admin.jsx';
  */
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>    
+  <StrictMode>
 
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<IslandsPage />}/>
+        <Route path="/intro" element={<Opening />} />
+        <Route path="/" element={<IslandsPage />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/Lines" element={<HomePage />} />
       </Routes>
