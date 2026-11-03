@@ -1,25 +1,69 @@
 import { useEffect, useState } from "react";
+import CurvedLineOfImages from "./connectionLines";
+import arrow from "../assets/arrow.svg";
 
 
 function ConnectionsEditor() {
 
   // The variable and Setter function. useState([Default Value])
-  const [variable, setVariable] = useState(["Default Value Here"]);
-
-  // Example: Timers, Fetching Data from the database, subscribing to events. This is optional, feel free to remove.
-  useEffect(() => {
-  }, []);
+  const [lines, setLines] = useState([]);
 
   // You can make functions inside of here
-  function addLine(){
-    
+  function addLine(event){
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+
+  //converts form values into number (you give it the form field name)
+  function readNumber(name) {
+  const value = formData.get(name);
+
+  if (typeof value !== "string") {
+    return NaN;
+  }
+
+  if (value.trim() === "") {
+    return NaN;
+  }
+
+  return Number(value);
+}
+
+
+    //getting the data
+    const start = { x: readNumber("startX"), y: readNumber("startY") };
+    const control = { x: readNumber("controlX"), y: readNumber("controlY") };
+    const end = { x: readNumber("endX"), y: readNumber("endY") };
+    const spacing = readNumber("spacing");
+
+
+    //some safety checks, will make sure we don't have non  number values and that spacing is > 0
+    if (
+      ![start.x, start.y, control.x, control.y, end.x, end.y, spacing]
+        .every(Number.isFinite) ||
+      spacing <= 0
+    ) {
+      return;
+    }
+
+    //add the new line to the lines array
+    setLines(function (currentLines) {
+  return [
+    ...currentLines,
+    { start, control, end, spacing, src: arrow },
+  ];
+});
+
+
   };
+
+
 
   // Put HTML in here. Whatever is in here will render on screen when the component is called.
   // Variables are called using {variable_name}
   return (
       <div>
-          <form id = "connectionsEditor">
+          <form id = "connectionsEditor" onSubmit={addLine}>
           <div> 
           <h2>Start</h2>
           <label for="startX">X:</label>
@@ -62,10 +106,17 @@ function ConnectionsEditor() {
           </div>
 
           <div>
-          <button onClick={addLine} id="addLineButton">Add Line</button>
+          <button type="submit" id="addLineButton">Add Line</button>
           </div>
           </form> 
 
+
+         { /*this is where all the lines are displayed*/}
+        <div style={{ position: "relative", minHeight: 900 }}>
+        {lines.map((line, index) => (
+          <CurvedLineOfImages key={index} {...line} />
+        ))}
+        </div>
           
          
     </div>
