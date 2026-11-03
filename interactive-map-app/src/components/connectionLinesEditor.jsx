@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import CurvedLineOfImages from "./connectionLines";
 import arrow from "../assets/arrow.svg";
+import ConnectionFileControls from "./ConnectionFileControls.jsx";
 
 
 function ConnectionsEditor() {
@@ -109,6 +110,10 @@ function ConnectionsEditor() {
           <button type="submit" id="addLineButton">Add Line</button>
           </div>
           </form> 
+          <ConnectionFileControls
+            lines={lines}
+            onLoad={setLines}
+          />
 
 
          { /*this is where all the lines are displayed*/}
