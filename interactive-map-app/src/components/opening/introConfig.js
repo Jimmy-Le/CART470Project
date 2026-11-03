@@ -84,7 +84,7 @@ export const introConfig = {
         seagullDelayMs: 2300,
         finalFadeOutMs: 900,
         skipFadeOutMs: 120,
-        carDelayMs: 600,
+        carDelayMs: 300,
     },
 
 
