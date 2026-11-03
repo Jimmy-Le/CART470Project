@@ -1,4 +1,5 @@
 import CurvedLineOfImages from "../components/connectionLines";
+import ConnectionsEditor from "../components/connectionLinesEditor"
 
 export default function HomePage() {
     return <div>
@@ -9,6 +10,9 @@ export default function HomePage() {
          control={{ x: 160, y: 600 }}
          end={{ x: 300, y: 850 }}
          src="../../../src/assets/arrow.svg" />
+
+         <ConnectionsEditor/>
         </div>;
+
     
 }
