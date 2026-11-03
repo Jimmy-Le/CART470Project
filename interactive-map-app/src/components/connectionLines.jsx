@@ -64,6 +64,7 @@ export default function CurvedLineOfImages({
                 width={imgSize}
                 height = {imgSize}
                 alt = {alt}
+                onClick={lineClicked}
                 //affects style to place it nicely
                 style = {{
                     position: "absolute",
@@ -77,7 +78,9 @@ export default function CurvedLineOfImages({
     </div>
 }
 
-
+function lineClicked(){
+    alert("Click!");
+}
 /// GARBAGE vvvvvvvvvvvvvvvvvvvvvvvTRY 2
  
     // //used to access the canvas

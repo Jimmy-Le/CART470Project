@@ -246,3 +246,42 @@ h1,h2{
       margin: 0 auto;
       margin-top: 10px;
     }
+
+
+    #connectionsEditor input{
+      width: 25%;
+      margin: 0px 10px;
+      border: solid, black, 0.5px;
+      border-radius: 5px;
+    }
+    #connectionsEditor label{
+      color: black;
+    }
+
+    #connectionsEditor div{
+      width: 30%;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    #connectionsEditor h2{
+      margin-bottom:5px;
+    }
+
+    #connectionsEditor{
+      text-align:left;
+      display:flex;
+      justify-content:space-around;
+      flex-wrap:wrap;
+      background-color: rgb(243, 230, 173);
+    }
+
+    #addLineButton{
+      background-color: #5e4fb1;
+      color: white;
+      border-radius: 10px;
+      width: 80%;
+      height: 60%;
+      margin-top:15px;
+      margin-left: 10%;
+    }
