@@ -248,6 +248,9 @@ h1,h2{
     }
 
 
+    /* Base styles for the coordinate form. For the current Lines page look,
+       check presentation-theme.css too: its #root selectors override these.
+       The toolbar and file buttons also have inline styles in their JSX files. */
     #connectionsEditor input{
       width: 25%;
       margin: 0px 10px;

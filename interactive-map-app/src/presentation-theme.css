@@ -1,3 +1,8 @@
+/* Styling map: shared colors/fonts first, then Lines, Admin, Water, and small screens.
+   For the Lines page, start with the #connectionsEditor rules below.
+   #root makes these selectors stronger than the base rules in App.css.
+   Some !important values override inline JSX styles; edit those overrides here
+   if changing a JSX background or padding seems to do nothing. */
 /* Shared presentation only. Existing page text and interactions are retained. */
 :root {
   --ui-paper: #f5f2e9;
@@ -14,59 +19,258 @@
   --code-bg: #f3f1ec;
   --accent: #5e4fb1;
 }
-body { background: var(--ui-paper); }
-#root:has(.atlas-shell) { width:100%; max-width:none; min-height:100svh; border:0; text-align:left; }
-#root:has(.atlas-shell) *, #root:has(.atlas-shell) *::before, #root:has(.atlas-shell) *::after { box-sizing:border-box; }
-#root:has(.atlas-shell) :is(p,a,button,input,select,textarea,label,output,th,td) { font-family:var(--ui-sans); }
-#root .atlas-nav { display:flex; justify-content:center; align-items:center; gap:12px; min-height:64px; padding:10px 16px; background:var(--ui-paper); border-bottom:1px solid var(--ui-border); }
-#root .atlas-nav a { color:#62616b; font-size:17px; padding:7px 16px; border-radius:6px; text-decoration:none; }
-#root .atlas-nav a.active { color:#51449b; background:#eae6f1; }
-#root .atlas-nav a:hover { background:#ece8df; }
-#root:has(.atlas-shell) :is(button,a,input,select,textarea):focus-visible { outline:3px solid #8d7cc7; outline-offset:3px; }
-#root:has(.atlas-shell) button:disabled { opacity:.42 !important; cursor:not-allowed !important; }
+body {
+  background: var(--ui-paper);
+}
+#root:has(.atlas-shell) {
+  width:100%;
+  max-width:none;
+  min-height:100svh;
+  border:0;
+  text-align:left;
+}
+#root:has(.atlas-shell) *, #root:has(.atlas-shell) *::before, #root:has(.atlas-shell) *::after {
+  box-sizing:border-box;
+}
+#root:has(.atlas-shell) :is(p,a,button,input,select,textarea,label,output,th,td) {
+  font-family:var(--ui-sans);
+}
+#root .atlas-nav {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  min-height:64px;
+  padding:10px 16px;
+  background:var(--ui-paper);
+  border-bottom:1px solid var(--ui-border);
+}
+#root .atlas-nav a {
+  color:#62616b;
+  font-size:17px;
+  padding:7px 16px;
+  border-radius:6px;
+  text-decoration:none;
+}
+#root .atlas-nav a.active {
+  color:#51449b;
+  background:#eae6f1;
+}
+#root .atlas-nav a:hover {
+  background:#ece8df;
+}
+#root:has(.atlas-shell) :is(button,a,input,select,textarea):focus-visible {
+  outline:3px solid #8d7cc7;
+  outline-offset:3px;
+}
+#root:has(.atlas-shell) button:disabled {
+  opacity:.42 !important;
+  cursor:not-allowed !important;
+}
 #root:has(.atlas-shell) input:not([type=range]):not([type=checkbox]):not([type=file]),
-#root:has(.atlas-shell) :is(select,textarea) { background:white; color:var(--ui-ink); border:1px solid #cbc8d0; border-radius:6px; padding:8px 10px; font-size:15px; }
-#root:has(.atlas-shell) code { color:#4d485b; background:#f3f1ec; overflow-wrap:anywhere; }
+#root:has(.atlas-shell) :is(select,textarea) {
+  background:white;
+  color:var(--ui-ink);
+  border:1px solid #cbc8d0;
+  border-radius:6px;
+  padding:8px 10px;
+  font-size:15px;
+}
+#root:has(.atlas-shell) code {
+  color:#4d485b;
+  background:#f3f1ec;
+  overflow-wrap:anywhere;
+}
+/* The form uses three columns on desktop. Input widths and gaps are just below. */
 /* Lines: white drawing tools and canvas, with the original purple accents. */
-#root:has([data-page=lines]) > div > h1 { display:block; text-align:center; margin:24px 0; font-size:40px; line-height:1.2; color:#34343d; }
-#root:has([data-page=lines]) > div > .atlas-shell + h1 + div { margin:0 auto 32px; width:calc(100% - 40px); max-width:1320px; background:white; border:1px solid var(--ui-border); border-radius:8px; overflow:hidden; }
-#root #connectionsEditor { background:white; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px 28px; padding:24px; border-bottom:1px solid var(--ui-border); }
-#root #connectionsEditor > div { width:auto; padding:0; min-width:0; }
-#root #connectionsEditor h2 { font:600 19px var(--ui-sans); color:#34343d; margin:0 0 10px; }
-#root #connectionsEditor label { font-size:15px; color:#61616b; }
-#root #connectionsEditor input { width:29%; min-width:54px; margin:0 10px 0 6px; height:38px; font-variant-numeric:tabular-nums; }
-#root #connectionsEditor select { min-width:120px; }
-#root #addLineButton { background:#5e4fb1; color:white; margin:20px 0 0; width:100%; min-height:40px; border-radius:6px; }
-#root:has([data-page=lines]) #connectionsEditor ~ div:first-of-type { background:white !important; padding:16px 24px !important; gap:10px !important; }
-#root:has([data-page=lines]) #connectionsEditor ~ p[role=status] { background:white !important; color:#61616b; padding:0 24px 16px !important; }
-#root:has([data-page=lines]) section[aria-label='Save and load connection lines'] { background:white !important; padding:16px 24px !important; border-top:1px solid var(--ui-border); border-bottom:1px solid var(--ui-border) !important; }
-#root:has([data-page=lines]) section[aria-label='Save and load connection lines'] + div > div { background-color:white !important; }
+#root:has([data-page=lines]) > div > h1 {
+  display:block;
+  text-align:center;
+  margin:24px 0;
+  font-size:40px;
+  line-height:1.2;
+  color:#34343d;
+}
+#root:has([data-page=lines]) > div > .atlas-shell + h1 + div {
+  margin:0 auto 32px;
+  width:calc(100% - 40px);
+  max-width:1320px;
+  background:white;
+  border:1px solid var(--ui-border);
+  border-radius:8px;
+  overflow:hidden;
+}
+#root #connectionsEditor {
+  background:white;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:20px 28px;
+  padding:24px;
+  border-bottom:1px solid var(--ui-border);
+}
+#root #connectionsEditor > div {
+  width:auto;
+  padding:0;
+  min-width:0;
+}
+#root #connectionsEditor h2 {
+  font:600 19px var(--ui-sans);
+  color:#34343d;
+  margin:0 0 10px;
+}
+#root #connectionsEditor label {
+  font-size:15px;
+  color:#61616b;
+}
+#root #connectionsEditor input {
+  width:29%;
+  min-width:54px;
+  margin:0 10px 0 6px;
+  height:38px;
+  font-variant-numeric:tabular-nums;
+}
+#root #connectionsEditor select {
+  min-width:120px;
+}
+#root #addLineButton {
+  background:#5e4fb1;
+  color:white;
+  margin:20px 0 0;
+  width:100%;
+  min-height:40px;
+  border-radius:6px;
+}
+#root:has([data-page=lines]) #connectionsEditor ~ div:first-of-type {
+  background:white !important;
+  padding:16px 24px !important;
+  gap:10px !important;
+}
+#root:has([data-page=lines]) #connectionsEditor ~ p[role=status] {
+  background:white !important;
+  color:#61616b;
+  padding:0 24px 16px !important;
+}
+#root:has([data-page=lines]) section[aria-label='Save and load connection lines'] {
+  background:white !important;
+  padding:16px 24px !important;
+  border-top:1px solid var(--ui-border);
+  border-bottom:1px solid var(--ui-border) !important;
+}
+#root:has([data-page=lines]) section[aria-label='Save and load connection lines'] + div > div {
+  background-color:white !important;
+}
 /* Admin: retain the familiar action colors. */
-#root:has([data-page=admin]) > div > .justify-end { width:calc(100% - 40px); max-width:1320px; margin:28px auto 0; padding:16px 20px; gap:10px; background:white; border:1px solid var(--ui-border); border-radius:8px 8px 0 0; }
-#root:has([data-page=admin]) > div > .overflow-y-auto { width:calc(100% - 40px); max-width:1320px; margin:0 auto 32px; padding:20px; background:white; border:1px solid var(--ui-border); border-top:0; border-radius:0 0 8px 8px; min-height:260px; overflow-x:auto; }
-#root:has([data-page=admin]) button { border:1px solid #d8d4ca; border-radius:6px; padding:9px 14px; background:#f4f1e9; color:#34343d; margin:0; font-size:15px; }
-#root:has([data-page=admin]) button[class*='bg-blue'] { background:#b8d9fc; border-color:#99c4f1; color:#203f62; }
-#root:has([data-page=admin]) button[class*='bg-green'] { background:#b8e8ca; border-color:#94d5ad; color:#234c34; }
-#root:has([data-page=admin]) button[class*='bg-amber'] { background:#f8e8b4; border-color:#e7d291; color:#66521e; }
-#root:has([data-page=admin]) button[class*='bg-red'] { background:#f4c1bc; border-color:#e8a09a; color:#7a302b; }
-#root:has([data-page=admin]) button:hover:not(:disabled) { filter:brightness(.96); }
-#root:has([data-page=admin]) table { width:100%; min-width:760px; border-collapse:collapse; font-size:15px; }
-#root:has([data-page=admin]) th { background:#f5f3ef; color:#57535d; text-align:left; padding:14px 12px; border:1px solid var(--ui-border); }
-#root:has([data-page=admin]) td { border-bottom:1px solid var(--ui-border); padding:14px 12px; }
-#root:has([data-page=admin]) td input:not([type=checkbox]) { max-width:180px; }
-#root:has([data-page=admin]) .fixed.inset-0 > div { background:white; color:var(--ui-ink); border-radius:8px; }
+#root:has([data-page=admin]) > div > .justify-end {
+  width:calc(100% - 40px);
+  max-width:1320px;
+  margin:28px auto 0;
+  padding:16px 20px;
+  gap:10px;
+  background:white;
+  border:1px solid var(--ui-border);
+  border-radius:8px 8px 0 0;
+}
+#root:has([data-page=admin]) > div > .overflow-y-auto {
+  width:calc(100% - 40px);
+  max-width:1320px;
+  margin:0 auto 32px;
+  padding:20px;
+  background:white;
+  border:1px solid var(--ui-border);
+  border-top:0;
+  border-radius:0 0 8px 8px;
+  min-height:260px;
+  overflow-x:auto;
+}
+#root:has([data-page=admin]) button {
+  border:1px solid #d8d4ca;
+  border-radius:6px;
+  padding:9px 14px;
+  background:#f4f1e9;
+  color:#34343d;
+  margin:0;
+  font-size:15px;
+}
+#root:has([data-page=admin]) button[class*='bg-blue'] {
+  background:#b8d9fc;
+  border-color:#99c4f1;
+  color:#203f62;
+}
+#root:has([data-page=admin]) button[class*='bg-green'] {
+  background:#b8e8ca;
+  border-color:#94d5ad;
+  color:#234c34;
+}
+#root:has([data-page=admin]) button[class*='bg-amber'] {
+  background:#f8e8b4;
+  border-color:#e7d291;
+  color:#66521e;
+}
+#root:has([data-page=admin]) button[class*='bg-red'] {
+  background:#f4c1bc;
+  border-color:#e8a09a;
+  color:#7a302b;
+}
+#root:has([data-page=admin]) button:hover:not(:disabled) {
+  filter:brightness(.96);
+}
+#root:has([data-page=admin]) table {
+  width:100%;
+  min-width:760px;
+  border-collapse:collapse;
+  font-size:15px;
+}
+#root:has([data-page=admin]) th {
+  background:#f5f3ef;
+  color:#57535d;
+  text-align:left;
+  padding:14px 12px;
+  border:1px solid var(--ui-border);
+}
+#root:has([data-page=admin]) td {
+  border-bottom:1px solid var(--ui-border);
+  padding:14px 12px;
+}
+#root:has([data-page=admin]) td input:not([type=checkbox]) {
+  max-width:180px;
+}
+#root:has([data-page=admin]) .fixed.inset-0 > div {
+  background:white;
+  color:var(--ui-ink);
+  border-radius:8px;
+}
 /* Preserve the map and its animated IM Fell English island lettering. */
-#root .water-map-page { background:var(--ui-paper); }
-#root .water-map-scene { height:calc(100svh - 64px); min-height:680px; }
-#root .water-map-scene .controls, #root .team-zoom-controls { font-family:var(--ui-sans); }
+#root .water-map-page {
+  background:var(--ui-paper);
+}
+#root .water-map-scene {
+  height:calc(100svh - 64px);
+  min-height:680px;
+}
+#root .water-map-scene .controls, #root .team-zoom-controls {
+  font-family:var(--ui-sans);
+}
+/* Two columns on narrower screens; one column on phones below 480px. */
 @media(max-width:800px) {
- #root #connectionsEditor { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 12px; padding:20px 16px; }
+ #root #connectionsEditor {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px 12px;
+  padding:20px 16px;
+}
  #root:has([data-page=lines]) > div > .atlas-shell + h1 + div,
  #root:has([data-page=admin]) > div > .justify-end,
- #root:has([data-page=admin]) > div > .overflow-y-auto { width:calc(100% - 24px); }
+ #root:has([data-page=admin]) > div > .overflow-y-auto {
+  width:calc(100% - 24px);
+}
 }
 @media(max-width:480px) {
- #root #connectionsEditor { grid-template-columns:1fr; }
- #root .atlas-nav { gap:4px; }
- #root:has([data-page=admin]) > div > .justify-end { flex-wrap:wrap; }
+ #root #connectionsEditor {
+  grid-template-columns:1fr;
+}
+ #root .atlas-nav {
+  gap:4px;
+}
+ #root:has([data-page=admin]) > div > .justify-end {
+  flex-wrap:wrap;
+}
 }

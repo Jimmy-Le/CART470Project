@@ -6,6 +6,10 @@ import ConnectionFileControls, {
 } from "./ConnectionFileControls.jsx";
 import defaultConnections from "./connections/data/connections.json";
 
+// Quick tour: this file handles the form, selecting lines, and drawing with the mouse.
+// ConnectionFileControls.jsx handles JSON; connectionLines.jsx draws the arrow images.
+// Start and End are the endpoints. Control pulls the curve toward it to make a bend.
+// Form values stay as text while you type; readForm() turns them into numbers.
 const emptyForm = {
   startX: "",
   startY: "",
@@ -16,6 +20,8 @@ const emptyForm = {
   spacing: "20",
 };
 
+// Styling tip: these are the shared toolbar button styles. Individual buttons below
+// add their own active/disabled colors. The form layout is in presentation-theme.css.
 const buttonStyle = {
   padding: "8px 14px",
   border: "1px solid #5e4fb1",
@@ -25,6 +31,8 @@ const buttonStyle = {
   cursor: "pointer",
 };
 
+// Tell SVG to move to Start (M), then draw a quadratic curve (Q) via Control to End.
+// This path is used for selection and guides; the arrow images are drawn separately.
 function curvePath(line) {
   return (
     `M ${line.start.x} ${line.start.y} ` +
@@ -33,6 +41,7 @@ function curvePath(line) {
   );
 }
 
+// When we select or drag a line, copy its coordinates back into the text boxes.
 function formFromLine(line) {
   return {
     startX: String(line.start.x),
@@ -46,6 +55,8 @@ function formFromLine(line) {
 }
 
 export default function ConnectionsEditor() {
+  // Start from the JSON shipped with the project each time this editor mounts.
+  // Edits live in React state here; they do not write back to the project file.
   const [lines, setLines] = useState(() => {
     try {
       return parseLines(JSON.stringify(defaultConnections));
@@ -55,6 +66,9 @@ export default function ConnectionsEditor() {
     }
   });
 
+  // selected is an array index (0 means the first line), not a permanent ID.
+  // drawing/startPoint/previewPoint track the two-click drawing process.
+  // history stores earlier line arrays so Undo can restore them.
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [drawing, setDrawing] = useState(false);
@@ -63,12 +77,16 @@ export default function ConnectionsEditor() {
   const [history, setHistory] = useState([]);
   const [message, setMessage] = useState("");
 
+  // Refs hold the SVG element and the current drag session between renders.
+  // Updating a ref alone does not redraw the screen; setLines/setForm do that.
   const canvasRef = useRef(null);
   const dragRef = useRef(null);
 
   const selectedLine =
     selected === null ? null : lines[selected] ?? null;
 
+  // Include the control points too, even when they sit beyond the visible curve.
+  // The 40-unit margin leaves space around the handles.
   // Keep enough room for existing imported coordinates.
   const points = lines.flatMap((line) => [
     line.start,
@@ -81,6 +99,8 @@ export default function ConnectionsEditor() {
   const maxX = Math.max(1200, ...points.map((p) => p.x + 40));
   const maxY = Math.max(700, ...points.map((p) => p.y + 40));
 
+  // Keep the same coordinate frame during a drag so the handle does not jump
+  // when moving a point would otherwise resize the canvas.
   // Freeze the drawing area while dragging.
   const bounds = dragRef.current?.bounds ?? {
     minX,
@@ -89,6 +109,7 @@ export default function ConnectionsEditor() {
     height: maxY - minY,
   };
 
+  // Keep at most 30 undo snapshots. Call this BEFORE changing the lines.
   function remember(previous) {
     setHistory((items) => [...items.slice(-29), previous]);
   }
@@ -99,6 +120,8 @@ export default function ConnectionsEditor() {
     setPreviewPoint(null);
   }
 
+  // Escape exits drawing mode. Remove the listener when the editor unmounts
+  // so revisiting this page does not stack up keyboard listeners.
   useEffect(() => {
     function onKeyDown(event) {
       if (event.key === "Escape") {
@@ -119,6 +142,8 @@ export default function ConnectionsEditor() {
     setMessage(`Line ${index + 1} selected. Drag its points or edit the coordinates.`);
   }
 
+  // Both Add Line and Update Selected go through this check.
+  // Blank fields are rejected first because Number("") would otherwise become 0.
   function readForm() {
     const values = {};
 
@@ -140,6 +165,8 @@ export default function ConnectionsEditor() {
     }]))[0];
   }
 
+  // The form adds a NEW line. Update Selected below replaces the selected one.
+  // Neither action saves a file automatically.
   function addLine(event) {
     event.preventDefault();
 
@@ -159,6 +186,7 @@ export default function ConnectionsEditor() {
     }
   }
 
+  // Replace just one array entry, leaving the other lines as they were.
   function updateSelected() {
     if (!selectedLine) return;
 
@@ -174,6 +202,7 @@ export default function ConnectionsEditor() {
     }
   }
 
+  // After deleting, clear the selection because the remaining indices shift.
   function deleteSelected() {
     if (!selectedLine) return;
 
@@ -185,6 +214,7 @@ export default function ConnectionsEditor() {
     setMessage("Selected line deleted. Use Undo to restore it.");
   }
 
+  // Restore the last snapshot and clear the handles/form to avoid a stale selection.
   function undo() {
     if (!history.length) return;
 
@@ -196,6 +226,8 @@ export default function ConnectionsEditor() {
     setMessage("Last change undone.");
   }
 
+  // The JSON component calls this after a successful import. Replace the whole
+  // list, but remember the old list first so the import can also be undone.
   function loadLines(importedLines) {
     remember(lines);
     setLines(importedLines);
@@ -205,6 +237,9 @@ export default function ConnectionsEditor() {
     setMessage("Imported lines loaded. Select any line to edit or delete it.");
   }
 
+  // Mouse positions arrive in browser pixels, but our lines use SVG coordinates.
+  // Invert the SVG screen transform so clicks still line up after scrolling or scaling.
+  // Round to one decimal place to keep the coordinate boxes readable.
   function pointerPosition(event) {
     const svg = canvasRef.current;
     const matrix = svg.getScreenCTM();
@@ -223,6 +258,7 @@ export default function ConnectionsEditor() {
     };
   }
 
+  // Draw Line switches into two-click mode. Clicking the button again cancels it.
   function toggleDraw() {
     if (drawing) {
       cancelDrawing();
@@ -242,6 +278,8 @@ export default function ConnectionsEditor() {
     setMessage("Click the canvas to place the start point. Esc cancels.");
   }
 
+  // First click: remember Start. Second click: create End and finish the line.
+  // We start Control at the midpoint, so the new line is straight until you bend it.
   function canvasClick(event) {
     if (!drawing) return;
 
@@ -255,6 +293,7 @@ export default function ConnectionsEditor() {
       return;
     }
 
+    // Ignore endpoints less than 5 units apart so we do not create a tiny accidental line.
     if (Math.hypot(
       point.x - startPoint.x,
       point.y - startPoint.y
@@ -284,6 +323,8 @@ export default function ConnectionsEditor() {
     setMessage("Line added. Drag Control to bend it.");
   }
 
+  // A handle passes its name (start/end/control) here. Keep the original lines
+  // for Undo/cancellation, and capture the pointer so dragging can continue outside the SVG.
   function beginDrag(event, key) {
     if (drawing || !selectedLine || event.button !== 0) return;
 
@@ -301,6 +342,8 @@ export default function ConnectionsEditor() {
     canvasRef.current.setPointerCapture(event.pointerId);
   }
 
+  // While dragging, update only that handle and keep the form in sync.
+  // In drawing mode, mouse movement only updates the preview, not the saved lines.
   function pointerMove(event) {
     const point = pointerPosition(event);
     if (!point) return;
@@ -326,6 +369,8 @@ export default function ConnectionsEditor() {
     }
   }
 
+  // One complete drag becomes ONE undo step, rather than a step for every mouse move.
+  // A browser pointer cancellation restores the positions from before the drag.
   function finishDrag(event, cancelled = false) {
     const drag = dragRef.current;
     if (!drag) return;
@@ -345,6 +390,7 @@ export default function ConnectionsEditor() {
     }
   }
 
+  // Reuse the same X/Y input layout for Start, Control, and End.
   function coordinateGroup(title, prefix) {
     return (
       <div>
@@ -375,6 +421,7 @@ export default function ConnectionsEditor() {
 
   return (
     <div>
+      {/* Coordinate entry: type values here, then Add Line or Update Selected. */}
       <form id="connectionsEditor" onSubmit={addLine}>
         {coordinateGroup("Start", "start")}
         {coordinateGroup("Control", "control")}
@@ -505,8 +552,10 @@ export default function ConnectionsEditor() {
           "Select a line to edit it, or choose Draw Line and click two points."}
       </p>
 
+      {/* Pass the current lines down for export, and a callback for importing replacements. */}
       <ConnectionFileControls lines={lines} onLoad={loadLines} />
 
+      {/* Canvas styling: scroll height, white background, and dot spacing live here. */}
       <div style={{ overflow: "auto", maxHeight: "75vh" }}>
         <div
           style={{
@@ -520,22 +569,24 @@ export default function ConnectionsEditor() {
           }}
         >
           {/* Reuse the original arrow-rendering component. */}
-<div
-  aria-hidden="true"
-  style={{
-    position: "absolute",
-    left: -bounds.minX,
-    top: -bounds.minY,
-    width: bounds.width,
-    height: bounds.height,
-    pointerEvents: "none",
-  }}
->
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              left: -bounds.minX,
+              top: -bounds.minY,
+              width: bounds.width,
+              height: bounds.height,
+              pointerEvents: "none",
+            }}
+          >
             {lines.map((line, index) => (
               <CurvedLineOfImages key={index} {...line} />
             ))}
           </div>
 
+          {/* This SVG sits above the images and receives clicks/drags.
+              Keep its viewBox aligned with the image layer offsets. */}
           <svg
             ref={canvasRef}
             width={bounds.width}
@@ -570,6 +621,8 @@ export default function ConnectionsEditor() {
               />
             ))}
 
+            {/* Selected-line guides: purple endpoints, orange Control, and dashed helper lines.
+                Change stroke/fill/r below to style these handles and guides. */}
             {selectedLine && !drawing && (
               <g>
                 <path
@@ -629,6 +682,7 @@ export default function ConnectionsEditor() {
               </g>
             )}
 
+            {/* Temporary preview between the first click and the current mouse position. */}
             {drawing && startPoint && previewPoint && (
               <g pointerEvents="none">
                 <line
