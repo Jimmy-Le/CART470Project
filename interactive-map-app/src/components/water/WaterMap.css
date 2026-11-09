@@ -4,7 +4,9 @@
 #root:has(.water-map-page) { width: 100%; border: 0; }
 .water-map-page { color: #314f4c; background: #f3f1e8; color-scheme: light; }
 .water-map-page > div > nav { min-height: 42px; display: flex; justify-content: center; align-items: center; gap: 22px; }
-.team-map-stage { position: relative; }
+.team-map-stage { 
+  position: relative;
+ }
 .water-map-scene { position: relative; height: calc(100svh - 42px); min-height: 680px; overflow: hidden; background: radial-gradient(ellipse at 25% 30%, #dce2d5, transparent 75%), #A2C4E5; font: 13px Arial,sans-serif; }
 .water-map-scene * { box-sizing: border-box; }
 .water-map-scene::after { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: .028; mix-blend-mode: multiply; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Cpath fill='%23000' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E"); }
@@ -85,8 +87,29 @@
 
 .team-map-notice { position: absolute; top: 155px; left: 20px; max-width: 230px; padding: 10px; font-size: 12px; background: #f1f3e9ef; border-radius: 8px; z-index: 6; }
 .team-island-preview { position: absolute; right: 85px; top: 20px; z-index: 7; }
-.team-preview-card { position: relative; box-shadow: 0 8px 25px #24483a15; }
-.team-preview-close { position: absolute; right: 6px; top: 3px; border: 0; background: transparent; cursor: pointer; font-size: 22px; color: #314f4c; }
+.team-preview-card { 
+  background-image: url("../../assets/paperCropped.png");
+  background-size: cover;
+  background-position: center;
+  position: relative; 
+  width:110%;
+ }
+ .team-preview-card h2{
+  font-family: "Winky Sans", sans-serif;
+  font-weight: 500;
+  padding-top:40px;
+  text-align:center;
+  font-size: 18px;
+ }
+.team-preview-close { 
+  position: absolute; 
+  right: 15px; 
+  top: 10px; 
+  border: 0; 
+  background: transparent; 
+  cursor: pointer; 
+  font-size: 22px; 
+  color: #000000; }
 .team-zoom-controls { position: absolute; top: 20px; right: 18px; z-index: 8; display: flex; flex-direction: column; gap: 6px; align-items: center; }
 .team-zoom-controls button { border: 0; background: #294f53; color: white; width: 44px; height: 40px; border-radius: 8px; font-size: 26px; cursor: pointer; }
 .team-zoom-controls button:disabled { opacity: .4; cursor: default; }
@@ -105,7 +128,9 @@
   .team-island-list-items { padding: 6px; }
   .team-island-list-items button { font-size: 12px; padding: 5px 8px; }
   .team-island-preview { top: 112px; left: 12px; right: auto; }
-  .team-preview-card { max-width: calc(100vw - 24px); }
+  .team-preview-card { 
+    max-width: calc(100vw - 24px); 
+  }
   .team-map-notice { top: 115px; left: 12px; }
 }
 
