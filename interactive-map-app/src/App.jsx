@@ -1,28 +1,18 @@
-import { Outlet, NavLink } from 'react-router-dom'
+import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import './App.css';
+import './presentation-theme.css';
 
-import './App.css'
-
-
-/***
- * This will make the navigation bar. 
- * Add this component to the top of each of your pages if you want the navigation bar
- * 
- * To add a new item,
- * <NavLink to="/[PATHNAME]"> [ButtonName] </NavLink>
- */
-function App() {
-
+export default function App() {
+  const { pathname } = useLocation();
+  const page = pathname.toLowerCase() === '/admin' ? 'admin' : pathname.toLowerCase() === '/lines' ? 'lines' : 'home';
   return (
-    <div>
-      <nav className='space-x-5'>
-        <NavLink to="/">Home</NavLink>
+    <div className="atlas-shell" data-page={page}>
+      <nav className="atlas-nav" aria-label="Main navigation">
+        <NavLink to="/" end>Home</NavLink>
         <NavLink to="/admin">Admin</NavLink>
         <NavLink to="/Lines">Lines</NavLink>
       </nav>
-
       <Outlet />
     </div>
-  )
+  );
 }
-
-export default App
