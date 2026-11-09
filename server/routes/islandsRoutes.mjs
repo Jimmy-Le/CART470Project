@@ -82,26 +82,6 @@ router.put("/:id", async (req, res) => {
 		details: error.message,
 		});
 	}
-
-
-
-
-
-
-
-
-
-	// try {
-	// 	const updatedIsland = await Island.findOneAndUpdate({ _id: req.params._id }, req.body, { returnDocument: 'after', runValidators: true });
-
-	// 	if (!updatedIsland) {
-	// 		return res.status(404).json({ error: "Island not found to update" });
-	// 	}
-
-	// 	res.json(updatedIsland);
-	// } catch (error) {
-	// 	res.status(500).json({ error: "Could not update island", details: error.message});
-	// }
 });
 
 // DELETE an island
