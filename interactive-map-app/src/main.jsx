@@ -16,6 +16,7 @@ import HomePage from './pages/HomePage.jsx';
 import IslandsPage from './pages/IslandsPage.jsx';
 import Admin from './pages/Admin.jsx';
 import Opening from './pages/Opening.jsx';
+import ExperimentMap from './components/click_experiment/ExperimentMap.jsx';
 
 //for the disappearing components stuff
 
@@ -37,6 +38,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/" element={<IslandsPage />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/Lines" element={<HomePage />} />
+        <Route path="/experiment" element={<ExperimentMap />} />
       </Routes>
     </BrowserRouter>
 
