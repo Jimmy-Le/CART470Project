@@ -10,7 +10,7 @@ export default function IslandDetail({island}) {
 		<div>
 			<App />
 			<p>
-				{island}
+				Island Details Page (WIP)
 			</p>
 		</div>
     );

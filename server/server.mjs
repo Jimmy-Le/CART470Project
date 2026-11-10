@@ -4,8 +4,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 import taskRoutes from "./routes/taskRoutes.mjs";
-import imageRoutes from "./routes/imageRoutes.mjs"
-import islandsRoutes from "./routes/islandsRoutes.mjs"
+import imageRoutes from "./routes/imageRoutes.mjs";
+import islandsRoutes from "./routes/islandsRoutes.mjs";
+import audioRoutes from "./routes/audioRoutes.mjs";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/images", imageRoutes);
 app.use("/api/image", imageRoutes);
 app.use("/api/islands", islandsRoutes)
+app.use("/api/audio", audioRoutes)
 
 
 
@@ -28,39 +30,7 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
     	console.error("MongoDB connection failed:", error);
 	});
 
-// Submit New Island
-app.post("/api/islands", requireAdmin, async (req, res) => {
-	const { identifier, imageID, enabled, EN, FR, IN } = req.body;
 
-	if (!imageID) {
-		return res.status(400).json({ error: "Image is required" });
-	}
-
-	const result = await islandsCollection.insertOne({
-		identifier,
-		imageID,
-		enabled: Boolean(enabled),
-		EN,
-		FR,
-		IN,
-		createdAt: new Date(),
-	});
-
-	res.status(201).json({
-		insertedId: result.insertedId,
-	});
-});
-
-// Get images
-app.get("/api/images", async (req, res) => {
-	try {
-		const images = await Image.find();
-		res.json(images);
-	} catch (error) {
-		console.error("GET /api/images failed:", error);
-		res.status(500).json({ error: "Could not load images" });
-	}
-});
 
 function requireAdmin(req, res, next) {
 	if (!req.user?.isAdmin) {

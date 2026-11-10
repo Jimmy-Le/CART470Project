@@ -1,11 +1,11 @@
-
+import { Link } from 'react-router-dom';
 import Tag from "./Tag.jsx";
 import IslandThumbnail from "./IslandThumbnail.jsx";
 
 import blueIsland from "../assets/blue.png";
 import testIsland from "../assets/TestIsland.png";
 
-function IslandPreview({ onClose }) {
+function IslandPreview({ onClose, island }) {
 
   const title = "Seagull Island";
 
@@ -21,6 +21,11 @@ function IslandPreview({ onClose }) {
     {id: "p2", link: testIsland},
     {id: "p3", link: blueIsland}
   ]
+
+
+  // This will handle the change 
+
+
 
   return (
       <div className="team-preview-card bg-amber-100 rounded-xl w-75 flex flex-col justify-center pb-3 z-10">
@@ -41,7 +46,7 @@ function IslandPreview({ onClose }) {
             ))}
           </ul>
           <hr className="my-3 mt-10" />
-          <a href="#island-information" className="text-orange-400 ">More Details</a>
+          <Link to={`/islands/${island._id}`} className="text-orange-400 ">More Details</Link>
       </div>   
   );
 }

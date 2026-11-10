@@ -31,13 +31,14 @@ router.get("/:_id", async (req, res) => {
 // CREATE an island
 router.post("/", async (req, res) => {
 	try {
-		const { identifier, islandImageID, imageID, enabled, EN, FR, IN } = req.body;
+		const { identifier, islandImageID, imageID, audio, enabled, EN, FR, IN } = req.body;
 
 		const island = await Island.create({
 			identifier: identifier,
 			islandImageID:  islandImageID ?? "",
 			imageID: imageID ?? "",
 			enabled: Boolean(enabled),
+			audio,
 			EN,
 			FR,
 			IN,

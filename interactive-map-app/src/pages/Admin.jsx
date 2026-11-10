@@ -1,18 +1,19 @@
 import { useState, useEffect, useRef } from "react";
-
-import TaskList from "../components/Database";
 import CreateConnection from "../components/admin/CreateConnection.jsx";
 import App from "../App.jsx"
 import ImagePicker from "../components/admin/ImagePicker.jsx";
 import IslandRow from "../components/admin/IslandRow.jsx";
 import LanguagePanel from "../components/admin/LanguagePanel.jsx";
-
+import AudioUploader from "../components/admin/AudioUploader.jsx";
+import AudioGallery from "../components/admin/AudioGallery.jsx";
 
 function createEmptyConnection(){
 	return {
 		category: "",
 		name: "",
 		description: "",
+		icon:"",
+		linkedIsland:"",
 	}
 }
 
@@ -24,6 +25,12 @@ function createEmptyLanguage(){
 	}
 }
 
+function createEmptyAudio(){
+	return{
+		name: "",
+		gridFsId:"",
+	}
+}
 
 // This function will normalize (set the information in the right position) the data
 function normalizeIsland(data) {
@@ -34,6 +41,7 @@ function normalizeIsland(data) {
 	islandImageID: data.islandImageID ?? "",
     imageID: data.imageID ?? "",
     enabled: data.enabled ?? true,
+	audio: data.audio ?? createEmptyAudio(),
     EN: data.EN ?? createEmptyLanguage(),
     FR: data.FR ?? createEmptyLanguage(),
     IN: data.IN ?? createEmptyLanguage(),
@@ -348,10 +356,11 @@ export default function Admin() {
 					className="hidden"
 				/>
 
-				<button type="button" onClick={handleImageClick} className="rounded bg-blue-300 p-2 m-1 text-black">
+				<AudioUploader />
+				<button type="button" onClick={handleImageClick} className=" w-30 self-end rounded bg-blue-300 p-2 m-1 text-black">
 					Upload image
 				</button>
-				<button type="button" onClick={saveAllIslands} className="rounded bg-green-300 p-2 m-1 text-black">
+				<button type="button" onClick={saveAllIslands} className=" w-30 self-end rounded bg-green-300 p-2 m-1 text-black">
 					Save All
 				</button>
 				<button className="w-30 self-end flex rounded p-2 m-1 bg-amber-50 justify-center" type="button" onClick={addRow}>
@@ -362,10 +371,11 @@ export default function Admin() {
 				<table className="w-full border-collapse">
 					<thead>
 						<tr>
+						<th className="border p-2">Enabled</th>
 						<th className="border p-2">Island Identifier</th>
 						<th className="border p-2">Island Image</th>
 						<th className="border p-2">Image</th>
-						<th className="border p-2">Enabled</th>
+						<th className="border p-2">Audio</th>
 						<th className="border p-2">Edit</th>
 						<th className="border p-2">Save</th>
 						<th className="border p-2">Delete</th>
@@ -378,6 +388,7 @@ export default function Admin() {
 							key={island._id ?? `new-island-${index}`}
 							island={island}
 							onUpdate={updateIsland}
+							onUpdateNested={updateLanguage}
 							openLanguagePanel={openLanguagePanel}
 							onSave={saveIsland}
 							onDelete={deleteIsland}
@@ -386,6 +397,7 @@ export default function Admin() {
 						))}
 					</tbody>
 				</table>
+
 			</div>
 		</div>    
     );
