@@ -1,4 +1,4 @@
-import image from '../../../assets/blue.png';
+import image from '../../../assets/brown.png';
 import audio from '../../../assets/audio/seagulls.mp3';
 
 // Replace these records with mapped API data when the island endpoint is ready.

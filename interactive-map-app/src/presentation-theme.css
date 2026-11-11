@@ -33,7 +33,7 @@ body {
   box-sizing:border-box;
 }
 #root:has(.atlas-shell) :is(p,a,button,input,select,textarea,label,output,th,td) {
-  font-family:var(--ui-sans);
+font-family: "Winky Sans", sans-serif;
 }
 #root .atlas-nav {
   display:flex;
