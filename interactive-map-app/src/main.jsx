@@ -34,6 +34,10 @@ createRoot(document.getElementById('root')).render(
 
     <BrowserRouter>
       <Routes>
+        <Route path="/credits/edit" element={
+          <iframe title="Credits editor" src={import.meta.env.BASE_URL + 'credits/editor.html'}
+            style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', border: 0 }} />
+        } />
         <Route path="/credits" element={
           <iframe
             title="Hochelaga Archipelago credits"

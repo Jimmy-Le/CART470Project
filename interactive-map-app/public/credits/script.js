@@ -1,20 +1,16 @@
-'use strict';
-// Change the names here. Supporting credits are fictional placeholders.
-const creditGroups = [
-  { title: 'A shared beginning.', subtitle: 'In collaboration with', people: [{role:'Project collaborator',name:'Liz Miller'}], note:'Stories, islands, and the connections between them.' },
-  { title: 'The map makers.', subtitle: 'Design & development', people: [
-    {role:'Project team',name:'Arielle Wong'}, {role:'Project team',name:'Sherwin Duran'},
-    {role:'Project team',name:'Junming He'}, {role:'Project team',name:'Jimmy Le'},
-    {role:'Project team',name:'Tianshun Wu'}] },
-  { title: 'Listening to the islands.', subtitle: 'Stories & sound', people: [
-    {role:'Field recordings',name:'Justin Case'}, {role:'Archival research',name:'Paige Turner'},
-    {role:'Water flow supervisor',name:'River Banks'}] },
-  { title: 'A little help ashore.', subtitle: 'Special thanks', people: [
-    {role:'Sales associate',name:'John Porc'}, {role:'Boat maintenance',name:'Rowan Oar'},
-    {role:'Seagull relations',name:'Steven Gull'}, {role:'Emotional support',name:'Sir Quacks-a-Lot'}], gull:true }
-];
-// Put the actual map URL here when integrating. Empty = replay this prototype.
-const MAP_URL = '';
+async function startCredits() {
+const data = await Credits.load(new URLSearchParams(location.search).has('preview'));
+const creditGroups = data.sections;
+const fields = {
+  skip: '.skip', eyebrow: '.hero .eyebrow', title: '.hero h1', intro: '.intro',
+  follow: '.follow-text', endingLabel: '.ending .eyebrow', endingTitle: '.ending h2 span',
+  endingEm: '.ending em', thanks: '.ending > p:not(.eyebrow)', back: '#return-link',
+  footerLeft: 'footer span:first-child', footerRight: 'footer span:last-child'
+};
+document.title = data.page.pageTitle.text;
+for (const [key, selector] of Object.entries(fields)) {
+  Credits.paint(document.querySelector(selector), data.page[key]);
+}
 const root = document.documentElement;
 const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 root.classList.add('js');
@@ -25,30 +21,30 @@ creditGroups.forEach((group,index) => {
   section.className = `credit-section ${index % 2 === 0 ? 'right' : 'left'}`;
   const content = document.createElement('div');
   content.className='credit-content reveal';
-  const label=document.createElement('span'); label.className='section-index'; label.textContent=`0${index+1} / ${group.subtitle}`;
-  const title=document.createElement('h2'); title.textContent=group.title;
+  const label=document.createElement('span'); label.className='section-index'; Credits.paint(label,group.label);
+  const title=document.createElement('h2'); Credits.paint(title,group.title);
   content.append(label,title);
   group.people.forEach(person=>{
     const entry=document.createElement('p'); entry.className='person';
-    const role=document.createElement('span'); role.className='role'; role.textContent=person.role;
-    const name=document.createElement('span'); name.className='name'; name.textContent=person.name;
+    const role=document.createElement('span'); role.className='role'; Credits.paint(role,person.role);
+    const name=document.createElement('span'); name.className='name'; Credits.paint(name,person.name);
     entry.append(role,name); content.append(entry);
   });
-  if(group.note){const note=document.createElement('p');note.className='caption';note.textContent=group.note;content.append(note);}
-  if(group.gull){
+  if(group.note.text){const note=document.createElement('p');note.className='caption';Credits.paint(note,group.note);content.append(note);}
+  if(index === creditGroups.length - 1){
     const gull=document.createElement('button');gull.className='gull';gull.setAttribute('aria-label','Say hello to Steven Gull');
     gull.innerHTML='<svg viewBox="0 0 100 70" aria-hidden="true"><path d="m38 49-2 15m13-15 1 14" stroke="#ae744b" stroke-width="2"/><path d="M15 30Q40 53 63 34Q57 13 72 15Q89 14 82 30Q86 48 62 52Q33 60 15 30Z" fill="#fcfbf3" stroke="#697771" stroke-width="1.5"/><path d="M28 38Q40 40 60 36Q52 54 28 38Z" fill="#bcc7c0"/><path d="m82 23 14 5-14 3" fill="#bd894d"/><circle cx="76" cy="22" r="1.8" fill="#293e3c"/></svg>';
     const scene=document.createElement('div');scene.className='gull-scene';
     const bubble=document.createElement('div');bubble.id='gull-note';bubble.setAttribute('role','status');bubble.setAttribute('aria-live','polite');
     gull.setAttribute('aria-controls','gull-note');gull.setAttribute('aria-expanded','false');
-    const gullLines=['Steven Gull would like a credit. And your fries.','Still no fries?','I supervised the entire river.','Nice boat. Does it come with snacks?','Fine. Put me above the director.'];
+    const gullLines=data.gullLines;
     let lineIndex=0;
     let timer;
     const closeBubble=()=>{bubble.classList.remove('show');bubble.textContent='';gull.setAttribute('aria-expanded','false');};
     gull.addEventListener('click',()=>{
       clearTimeout(timer);
       gull.classList.remove('flying');void gull.offsetWidth;gull.classList.add('flying');
-      bubble.textContent=gullLines[lineIndex++ % gullLines.length];
+      Credits.paint(bubble,gullLines[lineIndex++ % gullLines.length]);
       bubble.classList.add('show');gull.setAttribute('aria-expanded','true');
       timer=setTimeout(closeBubble,7000);
     });
@@ -59,13 +55,13 @@ creditGroups.forEach((group,index) => {
 });
 // Names reveal once. They stay readable when scrolling back up.
 if('IntersectionObserver' in window){
- const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target);}}),{threshold:.12});
+ const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target);}}),{threshold:0});
  document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 }else document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));
 const route=document.querySelector('#route');
 const river=document.querySelector('#river');
 const boat=document.querySelector('#boat');
-const length=route.getTotalLength();
+let length=0, riverHeight=0;
 let scheduled=false;
 const world=document.querySelector('.river-world');
 const dock=document.createElement('div');dock.className='dock';
@@ -83,21 +79,38 @@ const angleDifference=(a,b)=>((a-b+540)%360)-180;
 function update(){
  scheduled=false;
  const rect=river.getBoundingClientRect();
- const targetY=Math.max(0,Math.min(4000,(innerHeight*.6-rect.top)/rect.height*4000));
+ if (riverHeight !== rect.height) {
+   riverHeight = rect.height;
+   if (!riverHeight) return;
+   const steps = Math.ceil((riverHeight + 100) / 640);
+   const bends = ['M740,-100'];
+   for (let i = 0; i < steps; i++) {
+     const y = i * 640 - 100;
+     const start = i % 2 ? 445 : 740, end = i % 2 ? 740 : 445;
+     bends.push(`C${start},${y+260} ${end},${y+380} ${end},${y+640}`);
+   }
+   route.setAttribute('d', bends.join(' '));
+   river.setAttribute('viewBox', `0 0 1000 ${riverHeight}`);
+   length = route.getTotalLength();
+ }
+ const targetY=Math.max(0,Math.min(riverHeight,(innerHeight*.6-rect.top)/rect.height*riverHeight));
  let low=0,high=length;
  for(let i=0;i<18;i++){const mid=(low+high)/2;if(route.getPointAtLength(mid).y<targetY)low=mid;else high=mid;}
  const point=route.getPointAtLength((low+high)/2);
  const next=route.getPointAtLength(Math.min(length,(low+high)/2+4));
- const angle=Math.atan2((next.y-point.y)*rect.height/4000,(next.x-point.x)*rect.width/1000)*180/Math.PI+90;
+ const angle=Math.atan2((next.y-point.y)*rect.height/riverHeight,(next.x-point.x)*rect.width/1000)*180/Math.PI+90;
  const maxScroll=Math.max(0,document.documentElement.scrollHeight-innerHeight);
- const endY=(rect.height-innerHeight*.4)/rect.height*4000;
+ const ending=document.querySelector('.ending');
+ const endY=Math.max(ending.offsetTop+60, Math.min(rect.height-65, rect.height-innerHeight*.4));
  const end=riverPointAtY(endY);
- const berthX=end.x/1000*rect.width+48,berthY=end.y/4000*rect.height;
+ // Keep the pier on screen even when the mobile river extends beyond the viewport.
+ const berthX=Math.min(end.x/1000*rect.width+48,innerWidth-rect.left-190);
+ const berthY=end.y/riverHeight*rect.height;
  dock.style.transform=`translate(${berthX+22}px,${berthY-55}px)`;
  const arrival=Math.max(0,Math.min(1,(scrollY-(maxScroll-260))/260));
  docking=arrival*arrival*(3-2*arrival);
  targetX=point.x/1000*rect.width*(1-docking)+berthX*docking;
- targetYpx=point.y/4000*rect.height*(1-docking)+berthY*docking;
+ targetYpx=point.y/riverHeight*rect.height*(1-docking)+berthY*docking;
  targetHeading=angle+angleDifference(90,angle)*docking;
  if(!initialized){heading=targetHeading;boatX=targetX;boatY=targetYpx;wakeX=boatX;wakeY=boatY;initialized=true;}
 
@@ -108,11 +121,10 @@ function schedule(){if(!scheduled){scheduled=true;requestAnimationFrame(update);
 addEventListener('scroll',schedule,{passive:true});addEventListener('resize',schedule);
 const motion=document.querySelector('#motion');
 let paused=reduce.matches;
-function applyMotion(){root.classList.toggle('paused',paused);motion.setAttribute('aria-pressed',String(paused));motion.textContent=paused?'Resume water':'Pause water';motion.disabled=reduce.matches;if(reduce.matches)motion.textContent='Reduced motion';}
+function applyMotion(){root.classList.toggle('paused',paused);motion.setAttribute('aria-pressed',String(paused));motion.disabled=reduce.matches;Credits.paint(motion,data.page[reduce.matches?'reduced':paused?'resume':'pause']);}
 
 motion.addEventListener('click',()=>{paused=!paused;applyMotion();});
 reduce.addEventListener('change',()=>{root.classList.toggle('reduced',reduce.matches);paused=reduce.matches;applyMotion();});applyMotion();
-if(MAP_URL){const link=document.querySelector('#return-link');link.href=MAP_URL;link.textContent='Return to the map ↗';}
 
 // The camera stays nearly overhead. Roll is capped at 4 degrees, pitch at 1.1.
 // Turn-induced lean eases in/out; scroll position itself remains responsive.
@@ -153,3 +165,10 @@ addEventListener('visibilitychange',()=>{
 });
 update();animationId=requestAnimationFrame(animate);
 
+if ('ResizeObserver' in window) new ResizeObserver(schedule).observe(document.querySelector('main'));
+}
+startCredits().catch(error => {
+  const message = document.createElement('p');
+  message.textContent = 'Could not load the credits. ' + error.message;
+  document.querySelector('#credits').append(message);
+});
