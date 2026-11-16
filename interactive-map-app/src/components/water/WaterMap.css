@@ -146,3 +146,12 @@
   .team-zoom-controls { width: 140px; right: 10px; top: 10px; padding: 10px; box-sizing: border-box; }
   .team-island-preview { right: auto; top: 150px; }
 }
+
+.water-map-page .team-zoom-controls {
+  inset: auto auto 10px 12px;
+}
+@media (max-width: 650px) {
+  .water-map-page .team-zoom-controls {
+    left: 10px;
+  }
+}
