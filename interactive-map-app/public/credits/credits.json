@@ -223,6 +223,27 @@
           }
         }
       ]
+    },
+    {
+      "label": {
+        "text": "05 / Credits"
+      },
+      "title": {
+        "text": "New section"
+      },
+      "note": {
+        "text": "test"
+      },
+      "people": [
+        {
+          "role": {
+            "text": "test"
+          },
+          "name": {
+            "text": "John Smith"
+          }
+        }
+      ]
     }
   ]
 }
