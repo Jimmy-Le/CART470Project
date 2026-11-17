@@ -45,12 +45,8 @@ function IslandPreview({ onClose, island }) {
               </li>
             ))}
           </ul>
-<<<<<<< HEAD
-          <a href="#island-information" className="text-black text-xs text-right mr-8 mt-2 mb-7 hover:text-[#885304]"> More Details &gt;</a>
-=======
           <hr className="my-3 mt-10" />
           <Link to={`/islands/${island._id}`} className="text-orange-400 ">More Details</Link>
->>>>>>> 6bc91043abfb59d5ab88ae206bbc1cb43a7097b8
       </div>   
   );
 }

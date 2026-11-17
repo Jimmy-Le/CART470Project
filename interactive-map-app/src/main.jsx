@@ -17,11 +17,7 @@ import IslandsPage from './pages/IslandsPage.jsx';
 import IslandsPageBase from './pages/IslandsPageBase.jsx';
 import Admin from './pages/Admin.jsx';
 import Opening from './pages/Opening.jsx';
-<<<<<<< HEAD
-import ExperimentMap from './components/click_experiment/ExperimentMap.jsx';
-=======
 import IslandDetail from './pages/IslandDetail.jsx';
->>>>>>> 6bc91043abfb59d5ab88ae206bbc1cb43a7097b8
 
 //for the disappearing components stuff
 
