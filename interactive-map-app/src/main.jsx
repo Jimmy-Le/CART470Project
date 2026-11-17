@@ -43,11 +43,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/islands" element={<IslandsPageBase />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/Lines" element={<HomePage />} />
-<<<<<<< HEAD
-        <Route path="/experiment" element={<ExperimentMap />} />
-=======
         <Route path="/islands/:id" element={<IslandDetail /> }/>
->>>>>>> 6bc91043abfb59d5ab88ae206bbc1cb43a7097b8
       </Routes>
     </BrowserRouter>
 
