@@ -1,0 +1,249 @@
+{
+  "version": 1,
+  "page": {
+    "pageTitle": {
+      "text": "People behind the Archipelago"
+    },
+    "skip": {
+      "text": "Skip to credits"
+    },
+    "pause": {
+      "text": "Pause water"
+    },
+    "resume": {
+      "text": "Resume water"
+    },
+    "reduced": {
+      "text": "Reduced motion"
+    },
+    "eyebrow": {
+      "text": "Documentary encounters in the archipelago"
+    },
+    "title": {
+      "text": "Hochelaga\nArchipelago"
+    },
+    "intro": {
+      "text": "Meet the people behind\nthis journey through the islands."
+    },
+    "follow": {
+      "text": "Follow the current"
+    },
+    "endingLabel": {
+      "text": "The river carries on"
+    },
+    "endingTitle": {
+      "text": "And you,"
+    },
+    "endingEm": {
+      "text": "for exploring."
+    },
+    "thanks": {
+      "text": "Thank you for being part of the journey."
+    },
+    "back": {
+      "text": "Back to the beginning ↗"
+    },
+    "footerLeft": {
+      "text": "CART 470 · Concordia University"
+    },
+    "footerRight": {
+      "text": "Credits prototype / Fictional supporting names"
+    }
+  },
+  "gullLines": [
+    {
+      "text": "Steven Gull would like a credit. And your fries."
+    },
+    {
+      "text": "Still no fries?"
+    },
+    {
+      "text": "I supervised the entire river."
+    },
+    {
+      "text": "Nice boat. Does it come with snacks?"
+    },
+    {
+      "text": "Fine. Put me above the director."
+    }
+  ],
+  "sections": [
+    {
+      "label": {
+        "text": "01 / In collaboration with"
+      },
+      "title": {
+        "text": "A shared beginning."
+      },
+      "note": {
+        "text": "Stories, islands, and the connections between them."
+      },
+      "people": [
+        {
+          "role": {
+            "text": "Project collaborator"
+          },
+          "name": {
+            "text": "Liz Miller"
+          }
+        }
+      ]
+    },
+    {
+      "label": {
+        "text": "02 / Design & development"
+      },
+      "title": {
+        "text": "The map makers."
+      },
+      "note": {
+        "text": ""
+      },
+      "people": [
+        {
+          "role": {
+            "text": "Project team"
+          },
+          "name": {
+            "text": "Arielle Wong"
+          }
+        },
+        {
+          "role": {
+            "text": "Project team"
+          },
+          "name": {
+            "text": "Sherwin Duran"
+          }
+        },
+        {
+          "role": {
+            "text": "Project team"
+          },
+          "name": {
+            "text": "Junming He"
+          }
+        },
+        {
+          "role": {
+            "text": "Project team"
+          },
+          "name": {
+            "text": "Jimmy Le"
+          }
+        },
+        {
+          "role": {
+            "text": "Project team"
+          },
+          "name": {
+            "text": "Tianshun Wu"
+          }
+        }
+      ]
+    },
+    {
+      "label": {
+        "text": "03 / Stories & sound"
+      },
+      "title": {
+        "text": "Listening to the islands."
+      },
+      "note": {
+        "text": ""
+      },
+      "people": [
+        {
+          "role": {
+            "text": "Field recordings"
+          },
+          "name": {
+            "text": "Justin Case"
+          }
+        },
+        {
+          "role": {
+            "text": "Archival research"
+          },
+          "name": {
+            "text": "Paige Turner"
+          }
+        },
+        {
+          "role": {
+            "text": "Water flow supervisor"
+          },
+          "name": {
+            "text": "River Banks"
+          }
+        }
+      ]
+    },
+    {
+      "label": {
+        "text": "04 / Special thanks"
+      },
+      "title": {
+        "text": "A little help ashore."
+      },
+      "note": {
+        "text": ""
+      },
+      "people": [
+        {
+          "role": {
+            "text": "Sales associate"
+          },
+          "name": {
+            "text": "John Porc"
+          }
+        },
+        {
+          "role": {
+            "text": "Boat maintenance"
+          },
+          "name": {
+            "text": "Rowan Oar"
+          }
+        },
+        {
+          "role": {
+            "text": "Seagull relations"
+          },
+          "name": {
+            "text": "Steven Gull"
+          }
+        },
+        {
+          "role": {
+            "text": "Emotional support"
+          },
+          "name": {
+            "text": "Sir Quacks-a-Lot"
+          }
+        }
+      ]
+    },
+    {
+      "label": {
+        "text": "05 / Credits"
+      },
+      "title": {
+        "text": "New section"
+      },
+      "note": {
+        "text": "test"
+      },
+      "people": [
+        {
+          "role": {
+            "text": "test"
+          },
+          "name": {
+            "text": "John Smith"
+          }
+        }
+      ]
+    }
+  ]
+}

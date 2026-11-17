@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="An experimental credits journey for Documentary Encounters in the Hochelaga Archipelago.">
+<title>People behind the Archipelago</title>
+<link rel="stylesheet" href="style.css"><script src="boat.js" defer></script><script src="content.js" defer></script><script src="script.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#credits">Skip to credits</a>
+<header class="topbar"><button id="motion" aria-pressed="false">Pause water</button></header>
+<div class="progress" aria-hidden="true"><span id="progress"></span></div>
+<main id="top">
+<div class="river-world" aria-hidden="true">
+<svg id="river" viewBox="0 0 1000 4000" preserveAspectRatio="none">
+<defs>
+<filter id="wash" x="-40%" y="-5%" width="180%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".018" numOctaves="3" seed="12"/><feDisplacementMap in="SourceGraphic" scale="26"/><feGaussianBlur stdDeviation="2"/></filter>
+<path id="route" d="M740,-100 C850,220 350,360 530,740 S830,1120 570,1470 S330,1760 540,2110 S800,2450 560,2800 S300,3110 500,3450 S720,3830 470,4100"/>
+</defs>
+<use href="#route" class="river-halo"/><use href="#route" class="river-body"/><use href="#route" class="river-inner"/>
+<use href="#route" class="current one"/><use href="#route" class="current two"/>
+</svg>
+<div id="boat"><canvas id="paper-boat" width="96" height="96"></canvas></div>
+<div class="island island-a"></div><div class="island island-b"></div><div class="island island-c"></div>
+</div>
+<section class="hero">
+<p class="eyebrow">Documentary encounters in the archipelago</p>
+<h1>Hochelaga<br>Archipelago</h1>
+<p class="intro">Meet the people behind<br>this journey through the islands.</p>
+<a class="scroll-link" href="#credits"><span>↓</span> <span class="follow-text">Follow the current</span></a>
+</section>
+<div id="credits"></div>
+<section class="ending reveal">
+<p class="eyebrow">The river carries on</p><h2><span>And you,</span><br><em>for exploring.</em></h2>
+<p>Thank you for being part of the journey.</p>
+<a id="return-link" class="return" href="#top">Back to the beginning ↗</a>
+<footer><span>CART 470 · Concordia University</span><span>Credits prototype / Fictional supporting names</span></footer>
+</section>
+</main>
+<noscript><p class="no-js">Enable JavaScript to view the credits and interactive river.</p></noscript>
+</body></html>

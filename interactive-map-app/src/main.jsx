@@ -17,7 +17,7 @@ import IslandsPage from './pages/IslandsPage.jsx';
 import IslandsPageBase from './pages/IslandsPageBase.jsx';
 import Admin from './pages/Admin.jsx';
 import Opening from './pages/Opening.jsx';
-import IslandDetail from './pages/IslandDetail.jsx';
+import ExperimentMap from './components/click_experiment/experimentMap.jsx';
 
 //for the disappearing components stuff
 
@@ -38,12 +38,22 @@ createRoot(document.getElementById('root')).render(
 
     <BrowserRouter>
       <Routes>
+        <Route path="/credits/edit" element={
+          <iframe title="Credits editor" src={import.meta.env.BASE_URL + 'credits/editor.html'}
+            style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', border: 0 }} />
+        } />
+        <Route path="/credits" element={
+          <iframe
+            title="Hochelaga Archipelago credits"
+            src={import.meta.env.BASE_URL + 'credits/index.html'}
+            style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', border: 0 }}
+          />
+        } />
         <Route path="/intro" element={<Opening />} />
         <Route path="/" element={<IslandsPage />} />
         <Route path="/islands" element={<IslandsPageBase />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/Lines" element={<HomePage />} />
-        <Route path="/islands/:id" element={<IslandDetail /> }/>
       </Routes>
     </BrowserRouter>
 

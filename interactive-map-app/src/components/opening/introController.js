@@ -4,6 +4,7 @@ import { createIntroOverlay } from './introOverlay.js';
 import { testIslands } from './islandData.js';
 import { introIslandIds } from './introConfig.js';
 import { createIntroAudio } from './introAudio.js';
+import { createIntroLanguage } from './introLanguage.js';
 
 const intros = new WeakMap();
 const previews = new WeakSet();
@@ -155,6 +156,7 @@ export function startIntro(
     const beginButton = attract.querySelector('button');
     const container = map.getContainer();
     const stage = attract.parentElement;
+    const language = createIntroLanguage(stage, attract, document.querySelector('#intro-overlay'), skipButton);
     // Programmatic focus may inherit keyboard-style rings after a prevented click.
     const onPointerInput = () => stage.classList.add('intro-pointer-input');
     const onKeyboardInput = () => stage.classList.remove('intro-pointer-input');
@@ -205,6 +207,7 @@ export function startIntro(
         connectionLines.showFinal();
         restore();
         overlay.show();
+        language.show();
     }
 
     function cameraComplete() {
@@ -244,6 +247,7 @@ export function startIntro(
         setIslandMarkerVisibility(map, introIslandIds);
         restore();
         overlay.dispose();
+        language.dispose();
         beginButton.removeEventListener('click', beginFromAttract);
         stage.removeEventListener('pointerdown', onPointerInput, true);
         stage.removeEventListener('keydown', onKeyboardInput, true);
@@ -278,6 +282,7 @@ export function startIntro(
     function begin() {
         if (state !== 'idle' && state !== 'completed') return;
         state = 'waiting';
+        language.hide();
 
         //audio begin
         audio.begin();
@@ -386,6 +391,7 @@ export function startIntro(
     container.classList.add('intro-idle');
     skipButton.hidden = true;
     attract.hidden = false;
+    language.show();
     beginButton.addEventListener('click', beginFromAttract);
     container.addEventListener('click', beginFromMarker, true);
     map.once('remove', dispose);
