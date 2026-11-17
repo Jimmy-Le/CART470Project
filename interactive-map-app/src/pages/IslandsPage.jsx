@@ -1,10 +1,18 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import App from '../App.jsx';
 import IslandList from '../components/IslandList.jsx';
 import IslandPreview from '../components/IslandPreview.jsx';
 import IslandInformation from '../components/ComponentIslandInformation.jsx';
 import ZoomButtons from '../components/ComponentZoomButtons.jsx';
 import WaterMap from '../components/water/WaterMap.jsx';
+import { useDatabase } from '../components/Database.jsx';
+
+
+const fakeIslands = [{
+  _id: "6ae84ac8692686bd35b6aa48",
+  identifier: "MontrealADFSDF"
+}]
+
 
 export default function IslandsPage() {
   const map = useRef(null);
@@ -12,6 +20,12 @@ export default function IslandsPage() {
   const [zoom, setZoom] = useState(1);
   const [notice, setNotice] = useState('');
   const [activeIsland, setActiveIsland] = useState(null);
+  const [selectedIsland, setSelectedIsland] = useState(fakeIslands[0]);
+  const data = useDatabase();
+
+
+
+
   function selectIsland(id, name) {
     setActiveIsland(id);
     if (id === 'i1') {
@@ -23,6 +37,7 @@ export default function IslandsPage() {
       setNotice(`${name}: this island has not been added to the map yet.`);
     }
   }
+
   return (
     <main className="water-map-page">
       <App />
@@ -31,11 +46,11 @@ export default function IslandsPage() {
           setActiveIsland('i1'); setPreviewOpen(true); setNotice('');
         }} />
         <div className="team-island-list">
-          <IslandList activeIsland={activeIsland} onSelect={selectIsland} />
+          <IslandList islands={data.islands} activeIslandID={activeIsland} onSelect={selectIsland} />
         </div>
         {notice && <p className="team-map-notice" role="status">{notice}</p>}
         {previewOpen && <div className="team-island-preview">
-          <IslandPreview onClose={() => setPreviewOpen(false)} />
+          <IslandPreview island={selectedIsland} onClose={() => setPreviewOpen(false)} />
         </div>}
         <ZoomButtons zoom={zoom} onZoomChange={setZoom} />
       </section>

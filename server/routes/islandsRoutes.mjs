@@ -31,13 +31,14 @@ router.get("/:_id", async (req, res) => {
 // CREATE an island
 router.post("/", async (req, res) => {
 	try {
-		const { identifier, islandImageID, imageID, enabled, EN, FR, IN } = req.body;
+		const { identifier, islandImageID, imageID, audio, enabled, EN, FR, IN } = req.body;
 
 		const island = await Island.create({
 			identifier: identifier,
 			islandImageID:  islandImageID ?? "",
 			imageID: imageID ?? "",
 			enabled: Boolean(enabled),
+			audio,
 			EN,
 			FR,
 			IN,
@@ -82,26 +83,6 @@ router.put("/:id", async (req, res) => {
 		details: error.message,
 		});
 	}
-
-
-
-
-
-
-
-
-
-	// try {
-	// 	const updatedIsland = await Island.findOneAndUpdate({ _id: req.params._id }, req.body, { returnDocument: 'after', runValidators: true });
-
-	// 	if (!updatedIsland) {
-	// 		return res.status(404).json({ error: "Island not found to update" });
-	// 	}
-
-	// 	res.json(updatedIsland);
-	// } catch (error) {
-	// 	res.status(500).json({ error: "Could not update island", details: error.message});
-	// }
 });
 
 // DELETE an island

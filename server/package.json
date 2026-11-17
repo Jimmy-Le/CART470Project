@@ -15,7 +15,9 @@
     "cors": "^2.8.6",
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
+    "gridfs-stream": "^1.1.1",
     "mongoose": "^9.10.4",
-    "multer": "^2.5.0"
+    "multer": "^2.5.0",
+    "multer-gridfs-storage": "^6.2.3"
   }
 }

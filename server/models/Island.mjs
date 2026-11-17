@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Audio from "./Audio.mjs";
 
 const connectionSchema = new mongoose.Schema(
   {
@@ -19,9 +20,37 @@ const connectionSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    icon: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    linkedIsland: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
   },
   {_id: true}
 )
+
+const audioSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    gridFsId: {
+      type: String,
+      default: "",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 
 
@@ -59,6 +88,10 @@ const islandSchema = new mongoose.Schema(
     enabled: {
       type: Boolean,
       default: true,
+    },
+    audio:{
+      type: audioSchema,
+      default: () => ({}),
     },
     EN: {
       type: localizedIslandSchema,

@@ -8,9 +8,10 @@ export default function App() {
   return (
     <div className="atlas-shell" data-page={page}>
       <nav className="atlas-nav" aria-label="Main navigation">
-        <NavLink to="/" end>Home</NavLink>
+        <NavLink to="/islands" end>Home</NavLink>
         <NavLink to="/admin">Admin</NavLink>
         <NavLink to="/Lines">Lines</NavLink>
+        <NavLink to="/"> Water Map</NavLink>
       </nav>
       <Outlet />
     </div>

@@ -14,11 +14,17 @@ import IslandInformation from './components/ComponentIslandInformation.jsx'
 import ZoomButtons from './components/ComponentZoomButtons.jsx'
 import HomePage from './pages/HomePage.jsx';
 import IslandsPage from './pages/IslandsPage.jsx';
+import IslandsPageBase from './pages/IslandsPageBase.jsx';
 import Admin from './pages/Admin.jsx';
 import Opening from './pages/Opening.jsx';
+<<<<<<< HEAD
 import ExperimentMap from './components/click_experiment/ExperimentMap.jsx';
+=======
+import IslandDetail from './pages/IslandDetail.jsx';
+>>>>>>> 6bc91043abfb59d5ab88ae206bbc1cb43a7097b8
 
 //for the disappearing components stuff
+
 
 /***
  * To add a new "Page"
@@ -30,15 +36,22 @@ import ExperimentMap from './components/click_experiment/ExperimentMap.jsx';
  */
 
 createRoot(document.getElementById('root')).render(
+
+
   <StrictMode>
 
     <BrowserRouter>
       <Routes>
         <Route path="/intro" element={<Opening />} />
         <Route path="/" element={<IslandsPage />} />
+        <Route path="/islands" element={<IslandsPageBase />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/Lines" element={<HomePage />} />
+<<<<<<< HEAD
         <Route path="/experiment" element={<ExperimentMap />} />
+=======
+        <Route path="/islands/:id" element={<IslandDetail /> }/>
+>>>>>>> 6bc91043abfb59d5ab88ae206bbc1cb43a7097b8
       </Routes>
     </BrowserRouter>
 

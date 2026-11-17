@@ -6,8 +6,6 @@ import {useRef } from "react";
 function IslandComponent() {
   const audio = useRef(null)
 
-  
-
   function playAudio()
   {
     if(!audio.current)
