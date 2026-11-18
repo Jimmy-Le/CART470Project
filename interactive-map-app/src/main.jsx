@@ -17,7 +17,7 @@ import IslandsPage from './pages/IslandsPage.jsx';
 import IslandsPageBase from './pages/IslandsPageBase.jsx';
 import Admin from './pages/Admin.jsx';
 import Opening from './pages/Opening.jsx';
-import ExperimentMap from './components/click_experiment/experimentMap.jsx';
+import ExperimentMap from './components/click_experiment/ExperimentMap.jsx';
 
 //for the disappearing components stuff
 
