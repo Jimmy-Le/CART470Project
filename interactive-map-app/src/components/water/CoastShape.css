@@ -1,0 +1,4 @@
+.water-map-scene[data-coast-highlight="true"] .island.active .team-island-image {
+  filter: var(--watercolor-filter);
+  transform: none;
+}

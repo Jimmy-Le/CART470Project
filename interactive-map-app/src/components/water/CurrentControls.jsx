@@ -11,7 +11,7 @@ export function CurrentSlider({ name, label, value, min, max, step, disabled, on
   </label>;
 }
 
-export default function CurrentControls({ state, actions }) {
+export default function CurrentControls({ state, actions, children }) {
   const route = state.routes.find(item => item.id === state.selected);
   return <section className="controls" aria-label="Current editor">
     <div className="toolbar">
@@ -20,6 +20,7 @@ export default function CurrentControls({ state, actions }) {
       <button type="button" onClick={actions.overview}>Overview</button>
       <button type="button" aria-pressed={state.paused} onClick={actions.togglePause}>
         {state.paused ? 'Play' : 'Pause'}</button>
+      {children}
     </div>
     <p id="status" role="status">{state.status}</p>
     <div className="edit-row">

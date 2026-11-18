@@ -137,7 +137,12 @@ function togglePause() {
   updateUI();
 };
 
+let previousCenter = null;
 function overview() {
+  if (previousCenter) {
+    hideName();
+    return;
+  }
   camera.tx = 600;
   camera.ty = 400;
 };
@@ -150,6 +155,16 @@ window.addEventListener('keydown', e => {
 }, { signal });
 
 function hideName() {
+  clearIsland();
+  if (previousCenter) {
+    camera.tx = previousCenter.x;
+    camera.ty = previousCenter.y;
+    previousCenter = null;
+    onSelect(null);
+  }
+}
+
+function clearIsland() {
   names.forEach(name => name.hide());
   islands.forEach(el => {
     el.classList.remove('active');
@@ -161,9 +176,10 @@ function focusIsland(id = islandData[0]?.id) {
   const index = islandData.findIndex(item => item.id === id);
   if (index < 0) return;
   const data = islandData[index];
-  hideName();
-  camera.tx = data.camera?.x ?? data.x + data.width / 2;
-  camera.ty = data.camera?.y ?? data.y + data.height / 2;
+  previousCenter ??= { x: camera.tx, y: camera.ty };
+  clearIsland();
+  camera.tx = data.x + data.width / 2;
+  camera.ty = data.y + data.height / 2;
   names[index].reveal();
   islands[index].classList.add('active');
   islands[index].setAttribute('aria-pressed', 'true');
@@ -179,6 +195,10 @@ function mapPoint(e) {
     y: (e.clientY - r.top) / camera.scale
   };
 }
+
+scene.addEventListener('click', event => {
+  if (previousCenter && !editing && !event.target.closest('.island, .controls')) hideName();
+}, { signal });
 
 world.addEventListener('click', e => {
   if (e.target.closest('.island')) return;
@@ -261,10 +281,10 @@ const simulation = createWaterSimulation({ ctx, obstacles, grid, blocked, cellPo
 });
 const { rebuildField, draw, velocity } = simulation;
 
-function updateResolution() {
+function updateResolution(scale = camera.scale) {
   const ratio = Math.max(
     1,
-    Math.min(3, camera.scale * (globalThis.devicePixelRatio || 1))
+    Math.min(3, scale * (globalThis.devicePixelRatio || 1))
   );
 
   const width = Math.round(W * ratio);
@@ -300,6 +320,7 @@ function frame(t) {
 
   const k = reduced ? 1 : 1 - Math.exp(-dt * 4);
 
+  camera.scale += (fitScale * zoom - camera.scale) * k;
   camera.x += (camera.tx - camera.x) * k;
   camera.y += (camera.ty - camera.y) * k;
 
@@ -471,8 +492,7 @@ return {
   },
   setZoom(value) {
     zoom = Number.isFinite(value) ? Math.max(.7, Math.min(2, value)) : 1;
-    camera.scale = fitScale * zoom;
-    updateResolution();
+    updateResolution(fitScale * zoom);
   },
   destroy() {
     disposed = true;

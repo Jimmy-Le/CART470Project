@@ -1,3 +1,4 @@
+import CoastShape from './CoastShape.jsx';
 import { useEffect, useRef } from 'react';
 
 // One reusable island: geometry, image, audio and identity come from its record.
@@ -24,7 +25,6 @@ export default function WaterIsland({ island, onSelect }) {
     aria-label={`${island.name} — show island information`} aria-pressed="false"
     onMouseEnter={play} onMouseLeave={stop} onFocus={play} onBlur={stop}
     onClick={event => { event.stopPropagation(); onSelect(island.id); }}>
-    <svg viewBox={island.viewBox} aria-hidden="true"><path className="land" d={island.coast} /></svg>
-    <img className="team-island-image" src={island.image} alt="" draggable="false" />
+    <CoastShape island={island} />
   </button>;
 }
