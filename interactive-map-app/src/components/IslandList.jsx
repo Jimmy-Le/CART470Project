@@ -17,11 +17,21 @@ const islands = [
 
 ];
 export default function IslandList({ activeIsland, onSelect }) {
-  return <ul className="team-island-list-items">
+  return <div>
+    <div className="flex justify-between bg-red-900">
+      <a className="ml-5 m-auto">Intro</a>
+      <select className="languagePicker" defaultValue="EN">
+        <option value="FR">FR</option>
+        <option value="EN">EN</option>
+        <option value="KA">KA</option>
+      </select>
+    </div>
+    <ul className="team-island-list-items">
     <h2>List of Islands</h2>
     {islands.map(island => <li key={island.id}>
       <button type="button" aria-pressed={activeIsland === island.id}
         onClick={() => onSelect?.(island.id, island.name)}>{island.name}</button>
     </li>)}
-  </ul>;
+  </ul>
+  </div>;
 }
