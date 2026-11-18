@@ -42,7 +42,7 @@ const audioSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
-    gridFsId: {
+    driveFileId: {
       type: String,
       default: "",
     },

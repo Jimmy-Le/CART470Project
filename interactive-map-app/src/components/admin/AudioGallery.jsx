@@ -51,16 +51,16 @@ function AudioGallery({selectedAudioId, onSelect, onClose,}) {
                 (
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                     {audios.map((audio) => {
-                        const isSelected = audio.gridFsId === selectedAudioId;
+                        const isSelected = audio.driveFileId === selectedAudioId;
 
                         return (
 
-                            <button key={audio.gridFsId} type="button" onClick={() =>{console.log("Audio Selected:", audio.gridFsId); onSelect(audio)}} className={`rounded-lg border-4 p-1 ${isSelected ? "border-blue-500": "border-transparent"}`}>
+                            <button key={audio.driveFileId} type="button" onClick={() =>{console.log("Audio Selected:", audio.driveFileId); onSelect(audio)}} className={`rounded-lg border-4 p-1 ${isSelected ? "border-blue-500": "border-transparent"}`}>
                                 <p className="mt-1 truncate text-xs text-gray-600">
                                     {audio.name}
                                 </p>
                                 
-                                <audio controls src={`/api/audio/${audio.gridFsId}`} style={{ width: '100%', maxWidth: '400px' }}>
+                                <audio controls src={`/api/audio/${audio.driveFileId}`} style={{ width: '100%', maxWidth: '400px' }}>
                                     Your browser does not support the audio element.
                                 </audio>
             

@@ -24,7 +24,7 @@ export default function AudioCell({island, onUpdate, fieldName, label = "Choose 
         <AudioGallery
           selectedAudioId={selectedAudioId}
           onSelect={(audioId) => {
-            onUpdate(island._id, "audio","gridFsId", audioId.gridFsId);
+            onUpdate(island._id, "audio","driveFileId", audioId.driveFileId);
             onUpdate(island._id, "audio", "name", audioId.name)
             setIsPickerOpen(false);
           }}

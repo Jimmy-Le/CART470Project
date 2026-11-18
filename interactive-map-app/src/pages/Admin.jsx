@@ -7,61 +7,62 @@ import LanguagePanel from "../components/admin/LanguagePanel.jsx";
 import AudioUploader from "../components/admin/AudioUploader.jsx";
 import AudioGallery from "../components/admin/AudioGallery.jsx";
 
-function createEmptyConnection(){
+function createEmptyConnection() {
 	return {
 		category: "",
 		name: "",
 		description: "",
-		icon:"",
-		linkedIsland:"",
+		icon: "",
+		linkedIsland: "",
 	}
 }
 
-function createEmptyLanguage(){
-	return{
+function createEmptyLanguage() {
+	return {
 		name: "",
-		description:"",
-		connections:[createEmptyConnection()],
+		description: "",
+		connections: [createEmptyConnection()],
 	}
 }
 
-function createEmptyAudio(){
-	return{
+function createEmptyAudio() {
+	return {
 		name: "",
-		gridFsId:"",
+		driveFileId: "",
 	}
 }
 
 // This function will normalize (set the information in the right position) the data
 function normalizeIsland(data) {
-  return {
-	...data,
-	_id: data._id,
-	identifier: data.identifier ?? "New Island",
-	islandImageID: data.islandImageID ?? "",
-    imageID: data.imageID ?? "",
-    enabled: data.enabled ?? true,
-	audio: data.audio ?? createEmptyAudio(),
-    EN: data.EN ?? createEmptyLanguage(),
-    FR: data.FR ?? createEmptyLanguage(),
-    IN: data.IN ?? createEmptyLanguage(),
-  };
+	return {
+		...data,
+		_id: data._id,
+		identifier: data.identifier ?? "New Island",
+		islandImageID: data.islandImageID ?? "",
+		imageID: data.imageID ?? "",
+		enabled: data.enabled ?? true,
+		audio: data.audio ?? createEmptyAudio(),
+		EN: data.EN ?? createEmptyLanguage(),
+		FR: data.FR ?? createEmptyLanguage(),
+		IN: data.IN ?? createEmptyLanguage(),
+	};
 }
 
 
 export default function Admin() {
-    const[islands,setIslands] = useState([]);
-	const[savedIslands, setSavedIslands] = useState([]);
+	const [islands, setIslands] = useState([]);
+	const [savedIslands, setSavedIslands] = useState([]);
 
-	const[loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(true);
 	const [openIslandId, setOpenIslandId] = useState(null);
-	const [panelLanguage, setPanelLanguage] = useState("EN");  
+	const [panelLanguage, setPanelLanguage] = useState("EN");
 	const fileInputRef = useRef(null);
 
 	// -------------------------------- Images ----------------------------------------
 	function handleImageClick() {
 		fileInputRef.current?.click();
 	}
+
 	async function handleFileChange(event) {
 		const file = event.target.files?.[0];
 		if (!file) return;
@@ -81,6 +82,32 @@ export default function Admin() {
 			alert("Image is Uploaded!");
 		}
 
+	}
+
+	// ------------------------------------ Audio -------------------------------------------
+
+	function handleAudioClick() {
+		fileInputRef.current?.click();
+	}
+
+	async function handleAudioFileChange(event) {
+		const file = event.target.files?.[0];
+		if (!file) return;
+
+		const formData = new FormData();
+		formData.append("audio", file);
+
+		const response = await fetch("/api/audio", {
+			method: "POST",
+			body: formData,
+		});
+
+		if (!response.ok) {
+			alert("Could not upload audio.");
+			return;
+		} else {
+			alert("Audio is Uploaded!");
+		}
 	}
 	// ----------------------------------------------- Data -----------------------------------
 
@@ -131,11 +158,11 @@ export default function Admin() {
 		);
 
 		const savedIsland = normalizeIsland(await response.json());
-	
+
 
 		// Update the island list
 		setIslands((prev) =>
-				prev.map((row) =>
+			prev.map((row) =>
 				row === island ? normalizeIsland(savedIsland) : row
 			)
 		);
@@ -162,8 +189,8 @@ export default function Admin() {
 			alert("Could not save island.");
 			return false;
 		}
-		else{
-			if(showAlert){
+		else {
+			if (showAlert) {
 				alert("Save Successful!")
 			}
 		}
@@ -171,25 +198,23 @@ export default function Admin() {
 		return true;
 	}
 
-	async function saveAllIslands(){
+	async function saveAllIslands() {
 		let success = true;
 
-		for(const island of islands){
+		for (const island of islands) {
 			let status = await saveIsland(island, false);
-			if(!status)
-			{
+			if (!status) {
 				success = false;
 			}
 		}
 
-		if(success)
-		{
+		if (success) {
 			alert("All Islands Saved Successfully!")
 		}
 		else {
 			alert("There was an error saving one or more entries.")
 		}
-		
+
 	}
 
 
@@ -215,8 +240,8 @@ export default function Admin() {
 				return {
 					...island,
 					[language]: {
-					...island[language],
-					[field]: value,
+						...island[language],
+						[field]: value,
 					},
 				};
 			})
@@ -244,11 +269,10 @@ export default function Admin() {
 		}
 	}
 
-	function isIslandUnsaved(island){
+	function isIslandUnsaved(island) {
 		const savedIsland = savedIslands.find((row) => row._id === island._id);
 
-		if(!savedIsland)
-		{
+		if (!savedIsland) {
 			return true;
 		}
 
@@ -260,19 +284,18 @@ export default function Admin() {
 
 	// If the tables are still loading, return a placeholder
 	if (loading) {
-    	return <p>Loading islands...</p>;
-  	}
+		return <p>Loading islands...</p>;
+	}
 
 
 	// ---------------------------------- Edit Panel ----------------------------------
 
-	function openLanguagePanel(islandId){
+	function openLanguagePanel(islandId) {
 		setOpenIslandId(islandId);
 		setPanelLanguage("EN");
 	}
 
-	function closeLanguagePanel()
-	{
+	function closeLanguagePanel() {
 		setOpenIslandId(null);
 	}
 
@@ -307,13 +330,13 @@ export default function Admin() {
 		}));
 	}
 
-	function updateConnection(islandId, language, connectionIndex, field, value){
+	function updateConnection(islandId, language, connectionIndex, field, value) {
 		setIslands((prev) => prev.map((island) => {
-			if(island._id !==islandId){
+			if (island._id !== islandId) {
 				return island
 			}
 
-			const updatedConnections = island[language].connections.map((connection, index) => index === connectionIndex ? {...connection, [field]: value} : connection);
+			const updatedConnections = island[language].connections.map((connection, index) => index === connectionIndex ? { ...connection, [field]: value } : connection);
 
 			return {
 				...island,
@@ -325,13 +348,13 @@ export default function Admin() {
 		}))
 	}
 
-	function removeConnection(islandId, language, connectionIndex){
+	function removeConnection(islandId, language, connectionIndex) {
 		setIslands((prev) => prev.map((island) => {
-			if (island._id !== islandId){
+			if (island._id !== islandId) {
 				return island;
 			}
 
-			const updatedConnections = island[language].connections.filter((_,index)=> index !== connectionIndex);
+			const updatedConnections = island[language].connections.filter((_, index) => index !== connectionIndex);
 
 			return {
 				...island,
@@ -343,10 +366,10 @@ export default function Admin() {
 		}))
 	}
 
-    return (
+	return (
 		<div className="flex flex-col">
 			<App />
-			{openIsland && (<LanguagePanel  island={openIsland} language={panelLanguage} onLanguageChange={setPanelLanguage} onUpdateLanguage={updateLanguage} onClose={closeLanguagePanel} onAddConnection={addConnection} onUpdateConnection={updateConnection} onRemoveConnection={removeConnection} />)}
+			{openIsland && (<LanguagePanel island={openIsland} language={panelLanguage} onLanguageChange={setPanelLanguage} onUpdateLanguage={updateLanguage} onClose={closeLanguagePanel} onAddConnection={addConnection} onUpdateConnection={updateConnection} onRemoveConnection={removeConnection} />)}
 			<div className="flex flex-row justify-end">
 				<input
 					ref={fileInputRef}
@@ -355,8 +378,19 @@ export default function Admin() {
 					onChange={handleFileChange}
 					className="hidden"
 				/>
+				<input
+					ref={fileInputRef}
+					type="file"
+					accept="image/*"
+					onChange={handleAudioFileChange}
+					className="hidden"
+				/>
 
-				<AudioUploader />
+				
+				<button type="button" onClick={handleAudioClick} className=" w-30 self-end rounded bg-blue-300 p-2 m-1 text-black">
+					Upload Audio
+				</button>
+			
 				<button type="button" onClick={handleImageClick} className=" w-30 self-end rounded bg-blue-300 p-2 m-1 text-black">
 					Upload image
 				</button>
@@ -371,34 +405,34 @@ export default function Admin() {
 				<table className="w-full border-collapse">
 					<thead>
 						<tr>
-						<th className="border p-2">Enabled</th>
-						<th className="border p-2">Island Identifier</th>
-						<th className="border p-2">Island Image</th>
-						<th className="border p-2">Image</th>
-						<th className="border p-2">Audio</th>
-						<th className="border p-2">Edit</th>
-						<th className="border p-2">Save</th>
-						<th className="border p-2">Delete</th>
+							<th className="border p-2">Enabled</th>
+							<th className="border p-2">Island Identifier</th>
+							<th className="border p-2">Island Image</th>
+							<th className="border p-2">Image</th>
+							<th className="border p-2">Audio</th>
+							<th className="border p-2">Edit</th>
+							<th className="border p-2">Save</th>
+							<th className="border p-2">Delete</th>
 						</tr>
 					</thead>
 
 					<tbody>
 						{islands.map((island, index) => (
-						<IslandRow
-							key={island._id ?? `new-island-${index}`}
-							island={island}
-							onUpdate={updateIsland}
-							onUpdateNested={updateLanguage}
-							openLanguagePanel={openLanguagePanel}
-							onSave={saveIsland}
-							onDelete={deleteIsland}
-							isDirty = {isIslandUnsaved(island)}
-						/>
+							<IslandRow
+								key={island._id ?? `new-island-${index}`}
+								island={island}
+								onUpdate={updateIsland}
+								onUpdateNested={updateLanguage}
+								openLanguagePanel={openLanguagePanel}
+								onSave={saveIsland}
+								onDelete={deleteIsland}
+								isDirty={isIslandUnsaved(island)}
+							/>
 						))}
 					</tbody>
 				</table>
 
 			</div>
-		</div>    
-    );
+		</div>
+	);
 }

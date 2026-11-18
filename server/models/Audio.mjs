@@ -7,7 +7,7 @@ const audioSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    gridFsId: {
+    driveFileId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },

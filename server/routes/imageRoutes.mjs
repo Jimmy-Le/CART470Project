@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import Image from "../models/Image.mjs";
-import { uploadAssetToDrive, getAssetStreamFromDrive } from '../driveService.mjs';
+import { uploadAssetToDrive, getAssetStreamFromDrive, listImagesFromDrive } from '../driveService.mjs';
 
 
 
@@ -12,7 +12,9 @@ const upload = multer({ storage: multer.memoryStorage()});
 // Returns image metadata for the picker
 router.get("/", async (req, res) => {
   try {
-    const images = await Image.find().sort({createdAt: -1});
+    // const images = await Image.find().sort({createdAt: -1});
+
+    const images = await listImagesFromDrive();
  
     res.json(images);
 
@@ -26,7 +28,7 @@ router.get("/", async (req, res) => {
 // Returns the actual image file
 router.get("/:id", async (req, res) => {
   try {
-    const {stream, mimeType} = await getAssetStreamFromDrive(req.params.fileId);
+    const {stream, mimeType} = await getAssetStreamFromDrive(req.params.id);
     res.setHeader('Content-Type', mimeType);
     res.setHeader('Cache-Control', 'public, max-age=86400');
     stream.pipe(res);
