@@ -7,18 +7,19 @@ const imageSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    fileName: {
+    driveFileId:{
+      type:String,
+      required: true,
+      unique: true
+    },
+    mimeType: {
       type: String,
-      required: true,
+      required: true
     },
-    contentType: {
-      type: String,
-      required: true,
-    },
-    data: {
-      type: Buffer,
-      required: true,
-    },
+    createdAt:{
+      type: Date, 
+      default: Date.now
+    }
   },
   {
     timestamps: true,
