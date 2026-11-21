@@ -7,10 +7,20 @@ import svgIsland from "../assets/green.png"
 
 // TODO: Use Image and Audio from database
 function IslandComponent() {
-  const audio = useRef(null)
 
-  const [displayImage, setDisplayImage] = useState(island);
-  const islandName = "Ile Deslauriers";
+  let audio;
+  let islandName;
+  let islandWatercolor;
+  let islandSVG;
+  const [displayImage, setDisplayImage] = useState(islandWatercolor);
+
+  function constructor(map,audio, islandWatercolor,islandSVG, coord, islandName){
+    this.audio = audio;
+    this.islandName = islandName;
+    this.islandWatercolor = islandWatercolor;
+    this.islandSVG = islandSVG;
+  }
+  
   
   function playAudio()
   {

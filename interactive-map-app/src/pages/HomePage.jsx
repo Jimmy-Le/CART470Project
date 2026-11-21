@@ -1,4 +1,5 @@
 import IslandComponent from "../components/IslandComponent"
+import MapLeaflet from "../components/mapLeaflet.jsx"
 import App from "../App.jsx";
 
 export default function HomePage() {
@@ -6,7 +7,10 @@ export default function HomePage() {
         <App />
         
         <h1>Testing Page</h1>
-        <IslandComponent/>
+        <MapLeaflet/>
+     
+        
+
         </div>;
 
     

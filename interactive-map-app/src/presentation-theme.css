@@ -64,7 +64,13 @@ body {
   max-height:250px;
 }
 
-
+/*NEW MAP STUFF (LEAFLET)*/
+#root:has(.atlas-shell) #map {
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+  background-color:#BFD1CA;
+}
 
 
 
