@@ -6,27 +6,26 @@ import svgIsland from "../assets/green.png"
 
 
 // TODO: Use Image and Audio from database
-function IslandComponent() {
+function IslandComponent({
+  //props received by the parent (in this case, mapLeaflet)
+  audioClip = sound,
+  islandName = "placeholder",
+  islandWatercolor = island,
+  islandSVG = svgIsland,
+ 
 
-  let audio;
-  let islandName;
-  let islandWatercolor;
-  let islandSVG;
-  const [displayImage, setDisplayImage] = useState(islandWatercolor);
+}) {
 
-  function constructor(map,audio, islandWatercolor,islandSVG, coord, islandName){
-    this.audio = audio;
-    this.islandName = islandName;
-    this.islandWatercolor = islandWatercolor;
-    this.islandSVG = islandSVG;
-  }
+const [displayImage, setDisplayImage] = useState([island]);
+
+ const audio = useRef(null);
   
   
   function playAudio()
   {
     if(!audio.current)
     {
-      audio.current = new Audio(sound);
+      audio.current = new Audio(audioClip);
     }
     audio.current.play();
   }
@@ -42,18 +41,18 @@ function IslandComponent() {
 
   function toggleIslandFocus(){
     //switches to the opposite image when clicked
-    setDisplayImage((current) => current === island ? svgIsland : island);
+    setDisplayImage((current) => current === islandWatercolor ? islandSVG : islandWatercolor);
   }
 
 
   return (
-      <div className="fixed top-1/3 place-self-center">
+      <div>
         
-        <a className="island-blue" onMouseEnter={playAudio} onMouseLeave={pauseAudio} onClick={toggleIslandFocus}> {/*href="https://wastescapes.com/as-the-gull-flies/"*/}
+        <a className="island-blue relative text-center" onMouseEnter={playAudio} onMouseLeave={pauseAudio} onClick={toggleIslandFocus}> {/*href="https://wastescapes.com/as-the-gull-flies/"*/}
           <img src={displayImage} alt="blue watercolor painting"/> 
-          <p>{islandName}</p>
+          <p className="absolute top-1/2 left-1/2">{islandName}</p>
         </a>
-        <audio id="hoverAudio" src={sound} loop></audio>
+        <audio id="hoverAudio" src={audio} loop></audio>
         <div id="focusedJustIsland"></div>
       </div>
       

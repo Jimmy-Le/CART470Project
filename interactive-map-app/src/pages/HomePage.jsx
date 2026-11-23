@@ -8,6 +8,7 @@ export default function HomePage() {
         
         <h1>Testing Page</h1>
         <MapLeaflet/>
+        <IslandComponent/>
      
         
 
