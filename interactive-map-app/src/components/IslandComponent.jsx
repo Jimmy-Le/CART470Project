@@ -12,6 +12,7 @@ function IslandComponent({
   islandName = "placeholder",
   islandWatercolor = island,
   islandSVG = svgIsland,
+  imageSize,
  
 
 }) {
@@ -44,6 +45,7 @@ const [displayImage, setDisplayImage] = useState([island]);
     setDisplayImage((current) => current === islandWatercolor ? islandSVG : islandWatercolor);
   }
 
+  let resizeImage = "w-" + imageSize;
 
   return (
       <div>

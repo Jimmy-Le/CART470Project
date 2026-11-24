@@ -222,16 +222,19 @@ h1,h2{
 }
 
 /* Island Component Css */
-    .island-blue {
-      display: inline-block;
-      overflow: hidden;
-      border-radius: 15px;
+      .island-marker-icon>div,
+      .island-marker-icon>div>div,
+      .island-marker-icon .island-blue {
+      display: block;
+      width:100%;
+      height:100%;
     }
 
-    .island-blue img {
+    .island-marker-icon .island-blue img {
       display: block;
-      width: 10px;
-      max-width: 100%;
+      width:100%;
+      height:100%;
+      object-fit: contain;
       transition: transform 0.3s ease, filter 0.3s ease;
       cursor: pointer;
     }

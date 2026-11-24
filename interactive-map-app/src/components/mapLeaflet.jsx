@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useEffect, useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup , useMap} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import IslandComponent from "../components/IslandComponent";
 import { useMemo } from "react";
@@ -15,14 +15,14 @@ function MapLeaflet(){
   //JIMMMMMMMY REPLACE THE STUFF IN THIS ARRAY WITH YOUR OWN DATA
     const islandArray = [
     {
-      id: "montreal",
+      identifier: "montreal",
       name: "Montreal",
       position: [45.50884, -73.58781],
       normalImage: blueIsland,
       focusedImage: greenIsland,
     },
     {
-      id: "ile-jesus",
+      identifier: "ile-jesus",
       name: "Île Jésus",
       position: [45.6, -73.73],
       normalImage: greenIsland,
@@ -33,7 +33,7 @@ function MapLeaflet(){
   function renderIslandMarker(island) {
     return (
       <IslandMarker
-        key={island.id}
+        key={island.identifier}
         island={island}
       />
     );
@@ -58,6 +58,25 @@ return(
 //this will turn the island markers into IslandComponents
 //we feed it an island (give it the id)
 function IslandMarker(props) {
+
+  //for the zoom and resizing icons
+  const map = useMap();
+  const [zoom, setZoom] = useState(map.getZoom());
+
+  //checks if we zoom in
+  useEffect(function watchZoom() {
+    //setting the zoom to match the map's
+  function updateZoom() {
+    setZoom(map.getZoom());
+  }
+
+  //updates the zoom when the audience zooms in
+  map.on("zoomend", updateZoom);
+  return function stopWatchingZoom() {
+    map.off("zoomend", updateZoom);
+  };
+}, [map]);
+
   const island = props.island;
   //will handle click events
   const onSelect = props.onSelect;
@@ -69,19 +88,30 @@ function IslandMarker(props) {
 
   //use Memo remembers the element it created to avoid remaking it a bunch of times
   const markerIcon = useMemo(function createMarkerIcon() {
-    return divIcon({
-      html: iconElement,
-      className: "island-marker-icon",
-      iconSize: [10, 10],
-      //the icon will be centered on the coords
-      iconAnchor: [5, 5],
-    });
-  }, [iconElement]);
-
+    //gives the icon but scaled appropriately accodring to zoom
+  return scaleIcon(zoom, iconElement);
+}, [zoom, iconElement]);
+  
 
   function handleMarkerClick() {
     onSelect(island.id);
   }
+
+ function scaleIcon(newZoom, iconElement) {
+  //resizes the icon to the zoom level
+  const referenceZoom = 13;
+  const referenceSize = 500; // desired icon size at zoom 13
+  //MESS WITH REFSIZE IF THEY EVER OVERLAP (MAKE NUMBER SMALLER)
+  //this scales it so that the icons don't overlap (hopefully)
+  const size = referenceSize * 2 ** (newZoom - referenceZoom);
+
+  return divIcon({
+    html: iconElement,
+    className: "island-marker-icon",
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+  });
+}
 
 
   //Portal Renders the island component inside the empty div we made
