@@ -93,6 +93,31 @@ const islandSchema = new mongoose.Schema(
       type: audioSchema,
       default: () => ({}),
     },
+    x:{
+      type: Number,
+      default: 0,
+    },
+    y: {
+      type: Number,
+      default: 0,
+    },
+    width:{
+      type: Number,
+      default: 200,
+    },
+    height:{
+      type: Number,
+      default: 200,
+    },
+    camera:{
+      x: {type: Number, default: 300},
+      y: {type: Number, default: 300}
+    },
+    label:{
+      x: {type: Number, default: 300},
+      y: {type: Number, default: 300},
+      width: {type: Number, default: 300}
+    },
     EN: {
       type: localizedIslandSchema,
       default: () => ({}),
