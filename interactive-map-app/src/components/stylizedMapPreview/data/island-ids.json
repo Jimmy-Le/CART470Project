@@ -1,0 +1,94 @@
+[
+  {
+    "id": "sainte-helene",
+    "name": "Île Sainte-Hélène"
+  },
+  {
+    "id": "notre-dame",
+    "name": "Île Notre-Dame"
+  },
+  {
+    "id": "montreal",
+    "name": "Montréal"
+  },
+  {
+    "id": "deslauriers",
+    "name": "Île Deslauriers"
+  },
+  {
+    "id": "annexe",
+    "name": "Île Annexe"
+  },
+  {
+    "id": "sainte-therese",
+    "name": "Île Sainte-Thérèse"
+  },
+  {
+    "id": "charron",
+    "name": "Île Charron"
+  },
+  {
+    "id": "aigle",
+    "name": "Île Aigle"
+  },
+  {
+    "id": "bonfoin",
+    "name": "Île Bonfoin"
+  },
+  {
+    "id": "cerfeuils",
+    "name": "Île des Cerfeuils"
+  },
+  {
+    "id": "beauregard",
+    "name": "Île Beauregard"
+  },
+  {
+    "id": "herons",
+    "name": "Heron Island"
+  },
+  {
+    "id": "kennedy",
+    "name": "Kennedy Island"
+  },
+  {
+    "id": "jesus",
+    "name": "Île Jésus"
+  },
+  {
+    "id": "perrot",
+    "name": "Île Perrot"
+  },
+  {
+    "id": "lapierre",
+    "name": "Île Lapierre"
+  },
+  {
+    "id": "dorval",
+    "name": "Île Dorval"
+  },
+  {
+    "id": "verte",
+    "name": "Île Verte"
+  },
+  {
+    "id": "saint-laurent",
+    "name": "Île St. Laurent"
+  },
+  {
+    "id": "bourdon",
+    "name": "Île Bourdon"
+  },
+  {
+    "id": "bizard",
+    "name": "Île Bizard"
+  },
+  {
+    "id": "soeurs",
+    "name": "Île des Sœurs"
+  },
+  {
+    "id": "truie",
+    "name": "Île à la Truie"
+  }
+]
