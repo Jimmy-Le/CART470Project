@@ -12,8 +12,8 @@ function createEmptyConnection() {
 		category: "",
 		name: "",
 		description: "",
-		icon: "",
 		linkedIsland: "",
+		enabled: true,
 	}
 }
 
@@ -22,6 +22,7 @@ function createEmptyLanguage() {
 		name: "",
 		description: "",
 		connections: [createEmptyConnection()],
+		enabled: true,
 	}
 }
 
@@ -40,8 +41,14 @@ function normalizeIsland(data) {
 		identifier: data.identifier ?? "New Island",
 		islandImageID: data.islandImageID ?? "",
 		imageID: data.imageID ?? "",
+		svgImageID: data.svgImageID ?? "",
+		decorationImageID: data.decorationImageID ?? "",
 		enabled: data.enabled ?? true,
 		audio: data.audio ?? createEmptyAudio(),
+		x: data.x ?? 0,
+		y: data.y ?? 0,
+		width: data.width ?? 300,
+		height: data.height ?? 300,
 		EN: data.EN ?? createEmptyLanguage(),
 		FR: data.FR ?? createEmptyLanguage(),
 		IN: data.IN ?? createEmptyLanguage(),
@@ -138,7 +145,14 @@ export default function Admin() {
 			identifier: "New Island",
 			islandImageID: "",
 			imageID: "",
+			svgImageID: "",
+			decorationImageID: "",
+			x:  0,
+			y:  0,
+			width:  300,
+			height: 300,
 			enabled: true,
+			audio: createEmptyAudio()
 		});
 
 		setIslands((prev) => [...prev, newRow]);
@@ -323,6 +337,8 @@ export default function Admin() {
 							category: "",
 							name: "",
 							description: "",
+							linkedIsland:"",
+							enabled: true,
 						}
 					]
 				}
@@ -369,7 +385,7 @@ export default function Admin() {
 	return (
 		<div className="flex flex-col">
 			<App />
-			{openIsland && (<LanguagePanel island={openIsland} language={panelLanguage} onLanguageChange={setPanelLanguage} onUpdateLanguage={updateLanguage} onClose={closeLanguagePanel} onAddConnection={addConnection} onUpdateConnection={updateConnection} onRemoveConnection={removeConnection} />)}
+			{openIsland && (<LanguagePanel island={openIsland} islands={islands} language={panelLanguage} onLanguageChange={setPanelLanguage} onUpdateLanguage={updateLanguage} onClose={closeLanguagePanel} onAddConnection={addConnection} onUpdateConnection={updateConnection} onRemoveConnection={removeConnection} />)}
 			<div className="flex flex-row justify-end">
 				<input
 					ref={fileInputRef}
@@ -407,8 +423,7 @@ export default function Admin() {
 						<tr>
 							<th className="border p-2">Enabled</th>
 							<th className="border p-2">Island Identifier</th>
-							<th className="border p-2">Island Image</th>
-							<th className="border p-2">Image</th>
+							<th className="border p-2">Images</th>
 							<th className="border p-2">Audio</th>
 							<th className="border p-2">Actions</th>
 						</tr>

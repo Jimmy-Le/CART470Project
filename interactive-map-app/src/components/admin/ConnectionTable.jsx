@@ -8,23 +8,25 @@ const connections = [
   { id: "green", name: "Paths"},
 ];
 
-function ConnectionTable({connections, islandId, language, categories, onAddConnection, onRemoveConnection, onUpdateConnection}) {
+function ConnectionTable({connections, islandId, language, categories, onAddConnection, onRemoveConnection, onUpdateConnection, islands}) {
 
   return (
     <div>
       <table className="w-full border-collapse">
         <thead>
           <tr>
-          <th className="border p-2">Category</th>
-          <th className="border p-2">Name</th>
-          <th className="border p-2">Description</th>
-          <th className="border p-2">Remove</th>
+            <th className="border p-2">Enabled</th>
+            <th className="border p-2">Category</th>
+            <th className="border p-2">Name</th>
+            <th className="border p-2">Description</th>
+            <th className="border p-2">Linked Island</th>
+            <th className="border p-2">Remove</th>
           </tr>
         </thead>
 
         <tbody>
           {connections.map((connection, index) => (
-            <CreateConnection key={index} index={index} connection={connection} islandId={islandId} language={language} categories={categories} onUpdateConnection={onUpdateConnection} onRemoveConnection={onRemoveConnection}/>
+            <CreateConnection key={index} index={index} connection={connection} islands={islands} islandId={islandId} language={language} categories={categories} onUpdateConnection={onUpdateConnection} onRemoveConnection={onRemoveConnection}/>
           ))}
           
         </tbody>

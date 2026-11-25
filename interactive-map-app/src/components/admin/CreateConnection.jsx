@@ -5,7 +5,7 @@ import NameInput from "./NameInput";
 import DescriptionInput from "./DescriptionInput";
 
 
-function CreateConnection( {connection, index, islandId, language, categories, onUpdateConnection, onRemoveConnection}) {
+function CreateConnection( {connection, index, islandId, language, categories, onUpdateConnection, onRemoveConnection, islands = []}) {
 
   const defaultName = "New Connection";
   const [inputtedName, setName] = useState(defaultName);
@@ -17,6 +17,15 @@ function CreateConnection( {connection, index, islandId, language, categories, o
 
   return (
       	<tr>
+			{/* Enabled  */}
+			<td className="border p-2 text-center">
+				<input type="checkbox" checked={connection.enabled}
+					onChange={(event) =>
+						updateField("enabled", event.target.checked)
+					}
+				/>
+			</td>
+
 			{/* Island ID */}
 			<td className="border p-2">
 				<Categories value={connection.category} options={categories} onChange={(value) => updateField("category", value)}/>
@@ -27,6 +36,21 @@ function CreateConnection( {connection, index, islandId, language, categories, o
 			</td>
 			<td className="border p-2">
 				<DescriptionInput value={connection.description} onChange={(value)=> updateField("description", value)}/>
+			</td>
+
+			
+			{/* Target Island Dropdown */}
+			<td className="border p-2">
+				<select className="w-full border border-gray-300 rounded p-1.5 bg-white text-black" value={connection.linkedIsland || ""} onChange={(e) => updateField("linkedIsland", e.target.value)}>
+					<option value="">Select an island...</option>
+					{islands
+						.filter((isl) => isl._id !== islandId)					// Removes the current island from the list (cant link to itself)
+						.map((isl) => (
+							<option key={isl._id} value={isl._id}>
+								{isl.identifier || isl[language]?.name || "Unnamed Island"}
+							</option>
+					))}
+				</select>
 			</td>
 
 			<td className="border p-2">

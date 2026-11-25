@@ -20,15 +20,14 @@ const connectionSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
-    icon: {
-      type: String,
-      default: "",
-      trim: true,
-    },
     linkedIsland: {
       type: String,
       default: "",
       trim: true,
+    },
+    enabled: {
+      type: Boolean,
+      default: true,
     },
 
   },
@@ -66,6 +65,10 @@ const localizedIslandSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    enabled: {
+      type: Boolean,
+      default: true,
+    },
     connections: [connectionSchema],
   },
   { _id: false }
@@ -82,6 +85,14 @@ const islandSchema = new mongoose.Schema(
       default: "",
     },
     imageID: {
+      type: String,
+      default: "",
+    },
+    svgImageID: {
+      type: String,
+      default: "",
+    },
+    decorationImageID: {
       type: String,
       default: "",
     },
