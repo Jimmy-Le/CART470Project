@@ -410,9 +410,7 @@ export default function Admin() {
 							<th className="border p-2">Island Image</th>
 							<th className="border p-2">Image</th>
 							<th className="border p-2">Audio</th>
-							<th className="border p-2">Edit</th>
-							<th className="border p-2">Save</th>
-							<th className="border p-2">Delete</th>
+							<th className="border p-2">Actions</th>
 						</tr>
 					</thead>
 

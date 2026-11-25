@@ -1,6 +1,7 @@
 import ImagePicker from "./ImagePicker";
 import ImageCell from "./ImageCell";
 import AudioCell from "./AudioCell";
+import ActionsMenu from "./ActionsMenu";
 
 
 
@@ -33,36 +34,9 @@ export default function IslandRow({island, onUpdate, onUpdateNested, openLanguag
 			<ImageCell island={island} onUpdate={onUpdate} fieldName="imageID" label="Choose Island Image"/>
 			<AudioCell island={island} onUpdate={onUpdateNested} fieldName="audio" label="Choose Island Audio"/>
 
-			{/* Edit */}
+			{/*Actions Button */}
 			<td className="border p-2">
-				<button className="bg-blue-300 rounded py-1 px-3 text-black" type="button" onClick={() => openLanguagePanel(island._id)}>
-					Edit
-				</button>
-			</td>
-
-
-			{/* Save*/}
-			<td className="border p-2">
-				<button className="bg-green-300 rounded py-1 px-3 text-black" type="button" onClick={() => onSave(island)}>
-					Save
-				</button>
-			</td>
-
-			{/*Delete Button */}
-			<td className="border p-2">
-				<button className="bg-red-400 rounded py-1 px-3 text-black" type="button" 
-					onClick={() => {
-						const confirmed = window.confirm(
-							"Are you sure you want to delete this island? This cannot be undone."
-						);
-
-						if(confirmed){
-							onDelete(island);
-						}
-					}}>
-					
-					Delete
-				</button>
+				<ActionsMenu onSave={onSave} onDelete={onDelete} onEdit={openLanguagePanel} island={island} />
 			</td>
 		</tr>
 	);
