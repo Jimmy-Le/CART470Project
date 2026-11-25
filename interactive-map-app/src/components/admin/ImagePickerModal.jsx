@@ -10,7 +10,7 @@ export default function ImagePickerModal({selectedImageId, onSelect, onClose,}) 
         const response = await fetch("/api/images");
         const data = await response.json();
 
-        setImages(data);
+        setImages(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error(error);
       } finally {
@@ -45,7 +45,7 @@ export default function ImagePickerModal({selectedImageId, onSelect, onClose,}) 
 
               return (
                 <button key={image._id} type="button" onClick={() =>{console.log("Image Selected:", image._id); onSelect(image._id)}} className={`rounded-lg border-4 p-1 ${isSelected ? "border-blue-500": "border-transparent"}`}>
-                  <img src={image.url} alt={image.name} className="h-28 w-full rounded object-cover"/>
+                  <img src={`/api/images/${image.driveFileId}`} alt={image.name} className="h-28 w-full rounded object-cover"/>
 
                   <p className="mt-1 truncate text-xs text-gray-600">
                     {image.name}

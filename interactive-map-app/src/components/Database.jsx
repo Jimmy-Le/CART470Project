@@ -1,57 +1,69 @@
 import { useEffect, useState } from "react";
-import reactImg from '../assets/react.svg';
-import "../App.css"
 
-function TaskList() {
-  const [tasks, setTasks] = useState([]);
-  const [text, setText] = useState("");
-
-  useEffect(() => {
-    fetch("http://localhost:3001/api/tasks")
-      .then((response) => response.json())
-      .then((data) => setTasks(data));
-  }, []);
-
-  async function addTask() {
-    const response = await fetch("http://localhost:3001/api/tasks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text })
-    });
-
-    const newTask = await response.json();
-    setTasks([newTask, ...tasks]);
-    setText("");
-  }
-
-  return (
-    <div>
-      <div>
-        <h1>
-          Hochelaga Archipelago Interactive Map
-        </h1>
-        <p>Currently a work in progress!</p>
-        <img src={reactImg} className="base" width="170" height="179" alt="" />
-      
-      </div>
-      <br></br>
-      <hr></hr>
-      <h2>Database Entries</h2>
-      <label>
-        Test out the database: &nbsp;
-      </label>
-      <input
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-      />
-      <button onClick={addTask}>Add</button>
-      <ul>
-        {tasks.map((task) => (
-          <li key={task._id}>{task.text}</li>
-        ))}
-      </ul>
-    </div>
-  );
+/***
+ * This function creates an empty Connection Object
+ */
+function createEmptyConnection(){
+	return {
+		category: "",
+		name: "",
+		description: "",
+	}
 }
 
-export default TaskList;
+/***
+ * This function create an Empty Language Template
+ */
+function createEmptyLanguage(){
+	return{
+		name: "",
+		description:"",
+		connections:[createEmptyConnection()],
+	}
+}
+
+
+// This function will normalize (set the information in the right position) the data
+function normalizeIsland(data) {
+  return {
+	  ...data,
+    _id: data._id,
+    identifier: data.identifier ?? "New Island",
+    islandImageID: data.islandImageID ?? "",
+    imageID: data.imageID ?? "",
+    enabled: data.enabled ?? true,
+    EN: data.EN ?? createEmptyLanguage(),
+    FR: data.FR ?? createEmptyLanguage(),
+    IN: data.IN ?? createEmptyLanguage(),
+  };
+}
+
+
+
+export function useDatabase() {
+  const[islands,setIslands] = useState([]);
+  const[loading, setLoading] = useState(true);
+
+  // Load stored islands
+  useEffect(() => {
+    async function loadIslands() {
+      try {
+        const response = await fetch("/api/islands");
+        const data = await response.json();
+        const normalizedData = data.map(normalizeIsland);
+
+        setIslands(normalizedData);
+
+
+      } catch (error) {
+        console.error(error);
+      }  finally {
+				setLoading(false);
+			}
+    }
+    loadIslands();
+  }, []);
+
+  // This returns the list of islands and wheter or not the islands finished loading
+  return ({islands, loading});
+}

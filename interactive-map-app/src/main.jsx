@@ -14,11 +14,13 @@ import IslandInformation from './components/ComponentIslandInformation.jsx'
 import ZoomButtons from './components/ComponentZoomButtons.jsx'
 import HomePage from './pages/HomePage.jsx';
 import IslandsPage from './pages/IslandsPage.jsx';
+import IslandsPageBase from './pages/IslandsPageBase.jsx';
 import Admin from './pages/Admin.jsx';
 import Opening from './pages/Opening.jsx';
-import ExperimentMap from './components/click_experiment/experimentMap.jsx';
+import ExperimentMap from './components/click_experiment/ExperimentMap.jsx';
 
 //for the disappearing components stuff
+
 
 /***
  * To add a new "Page"
@@ -30,6 +32,8 @@ import ExperimentMap from './components/click_experiment/experimentMap.jsx';
  */
 
 createRoot(document.getElementById('root')).render(
+
+
   <StrictMode>
 
     <BrowserRouter>
@@ -47,9 +51,9 @@ createRoot(document.getElementById('root')).render(
         } />
         <Route path="/intro" element={<Opening />} />
         <Route path="/" element={<IslandsPage />} />
+        <Route path="/islands" element={<IslandsPageBase />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/Lines" element={<HomePage />} />
-        <Route path="/experiment" element={<ExperimentMap />} />
       </Routes>
     </BrowserRouter>
 
