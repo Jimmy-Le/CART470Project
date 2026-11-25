@@ -46,7 +46,6 @@ function IslandPreview({ onClose, title = "Seagull Island", island }) {
             ))}
           </ul>
           <hr className="my-3 mt-10" />
-          <Link to={`/islands/${island._id}`} className="text-orange-400 ">More Details</Link>
       </div>   
   );
 }
