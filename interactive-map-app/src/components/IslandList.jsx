@@ -1,4 +1,4 @@
-const islands = [
+export const islands = [
   { id: 'i1', name: 'Ile Deslauriers' },
   { id: 'i2', name: 'Ile Sainte-Helene' },
   { id: 'i3', name: 'Ile Notre-Dame' },

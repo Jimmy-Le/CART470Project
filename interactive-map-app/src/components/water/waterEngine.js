@@ -1,10 +1,11 @@
+import { attachPan } from './placement/pan.js';
 import { createWaterSimulation } from './engine/waterSimulation.js';
 import { createPathfinder } from './engine/pathfinding.js';
 import { measure, at, routeName } from './engine/routeMath.js';
 import { createNameAnimation } from './engine/nameAnimation.js';
 import { serializeCurrents, normalizeCurrents } from './data/currentStorage.js';
 // Adapted from Tianshun's water prototype. One isolated engine per mounted map.
-export function createWaterMap(root, { islands: islandData, currents = [], onSelect = () => {}, onStateChange = () => {}, onCurrentsChange = () => {} } = {}) {
+export function createWaterMap(root, { islands: islandData, currents = [], view, onSelect = () => {}, onStateChange = () => {}, onCurrentsChange = () => {} } = {}) {
 const abort = new AbortController();
 const signal = abort.signal;
 let frameId = 0;
@@ -25,13 +26,14 @@ const H = 800;
 const CELL = 8;
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const camera = { x: 600, y: 400, tx: 600, ty: 400, scale: 1 };
+const camera = { x: 600, y: 400, tx: 600, ty: 400, scale: 1, ...view?.camera };
+attachPan(scene, camera, signal);
 
 let routes = [];
 let selected = -1;
 let editing = false;
 let start = null;
-let paused = reduced;
+let paused = view?.paused ?? reduced;
 let last = 0;
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -301,11 +303,11 @@ function updateResolution(scale = camera.scale) {
 
 function resize() {
   const rect = scene.getBoundingClientRect();
-  const panel = root.querySelector('.controls').getBoundingClientRect();
+  // Reserve the controller's maximum height so status text cannot shift the map.
 
   camera.scale = Math.min(
     (rect.width - 24) / W,
-    (rect.height - panel.height - 44) / H
+    (rect.height * .6 - 44) / H
   );
 
   fitScale = Math.max(.12, camera.scale);
@@ -324,8 +326,7 @@ function frame(t) {
   camera.x += (camera.tx - camera.x) * k;
   camera.y += (camera.ty - camera.y) * k;
 
-  const available = scene.clientHeight -
-    root.querySelector('.controls').offsetHeight - 36;
+  const available = scene.clientHeight * .6 - 36;
 
   world.style.left = `${scene.clientWidth / 2}px`;
   world.style.top = `${available / 2}px`;
@@ -358,6 +359,7 @@ function loadCurrents(records) {
   start = null;
 }
 loadCurrents(currents);
+if (routes.some(r => r.id === view?.selected)) selected = view.selected;
 rebuildField();
 updateUI();
 resize();
@@ -474,6 +476,7 @@ window.addEventListener('keydown', (event) => {
   }
 }, { capture: true, signal });
 return {
+  getView: () => ({ camera: { ...camera }, paused, selected }),
   focusIsland,
   hideName,
   toggleAdd, selectCurrent, updateCurrent, reverseCurrent, deleteCurrent, togglePause, overview,

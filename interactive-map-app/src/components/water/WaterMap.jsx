@@ -1,5 +1,6 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { defaultIslands } from './data/islands.js';
+import IslandPlacement from './placement/IslandPlacement.jsx';
 import WaterIsland from './WaterIsland.jsx';
 import IslandName from './IslandName.jsx';
 import CurrentControls from './CurrentControls.jsx';
@@ -7,7 +8,7 @@ import useWaterEngine from './hooks/useWaterEngine.js';
 import './WaterMap.css';
 
 const WaterMap = forwardRef(function WaterMap({ onSelect, zoom = 1, islands = defaultIslands,
-  initialCurrents, onCurrentsChange }, ref) {
+  initialCurrents, onCurrentsChange, positions, onPositionsChange }, ref) {
   const [highlight, setHighlight] = useState(true);
   const host = useRef(null);
   const { engine, state, actions } = useWaterEngine(host, {
@@ -27,6 +28,8 @@ const WaterMap = forwardRef(function WaterMap({ onSelect, zoom = 1, islands = de
       {islands.map(island => <IslandName key={island.id} island={island} />)}
     </div>
     <CurrentControls state={state} actions={actions}>
+      {positions && <IslandPlacement host={host} engine={engine} positions={positions}
+        onChange={onPositionsChange} editing={state.editing} />}
       <label><input type="checkbox" checked={highlight}
         onChange={event => setHighlight(event.target.checked)} /> Island highlight</label>
     </CurrentControls>

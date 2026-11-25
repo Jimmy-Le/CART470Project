@@ -7,6 +7,7 @@ export default function useWaterEngine(host, { islands, initialCurrents,
   const engine = useRef(null);
   const callbacks = useRef({ onSelect, onCurrentsChange });
   const initial = useRef(initialCurrents);
+  const view = useRef(null);
   const currentZoom = useRef(zoom);
   const [state, setState] = useState({ routes: [], selected: -1, editing: false,
     paused: false, status: 'Add a current, then choose two points in the water.' });
@@ -14,7 +15,7 @@ export default function useWaterEngine(host, { islands, initialCurrents,
   useEffect(() => { currentZoom.current = zoom; engine.current?.setZoom(zoom); }, [zoom]);
   useEffect(() => {
     const map = createWaterMap(host.current, {
-      islands,
+      islands, view: view.current,
       currents: initial.current ?? loadProjectCurrents(),
       onSelect: (...args) => callbacks.current.onSelect?.(...args),
       onStateChange: setState,
@@ -24,7 +25,12 @@ export default function useWaterEngine(host, { islands, initialCurrents,
     });
     engine.current = map;
     map.setZoom(currentZoom.current);
-    return () => { map.destroy(); engine.current = null; };
+    return () => {
+      initial.current = map.getCurrents();
+      view.current = map.getView();
+      map.destroy();
+      engine.current = null;
+    };
   }, [host, islands]);
   const call = name => (...args) => engine.current?.[name](...args);
   return { engine, state, actions: {
