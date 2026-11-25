@@ -1,35 +1,72 @@
-/* Map colors and texture settings. */
+/* Change the map colors here. */
 .smp-page, .smp-map {
   --smp-context: #E7DFC5;
   --smp-blue: #417F8E;
-  --smp-blue-light: #568F9C;
-  --smp-blue-deep: #417F8E;
-  --smp-shallows: #75A9AF;
   --smp-green: #A7B98B;
-  --smp-green-dark: #78976D;
-  --smp-green-light: #C6CD9E;
-  --smp-green-mid: #96AC7E;
-  --smp-patch-opacity: 0.52;
-  --smp-patch-edge-opacity: 0.12;
-  --smp-patch-edge-width: 2;
-  --smp-water-patch-opacity: 0.16;
-  --smp-shore-width: 3;
   --smp-coast: #58765A;
   --smp-ink: #354C39;
   --smp-hover: #D4DFAC;
-  --smp-selected: #B8CA91;
-  --smp-selected-stroke: #415E43;
-  --smp-land-wash-opacity: 0.9;
-  --smp-water-wash-opacity: 0.7;
-  --smp-shore-opacity: 0.65;
-  --smp-grain-opacity: 0.045;
+  --smp-hover-stroke: #415E43;
 }
+
+.smp-map {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  background: var(--smp-context);
+  border: 1px solid #bacfc8;
+  border-radius: 12px;
+}
+
+.smp-map > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 14 / 9;
+}
+
+/* The land and water are just solid fills. */
+.smp-map .smp-context { fill: var(--smp-context); }
+.smp-water-base { fill: var(--smp-blue); stroke: none; }
+.smp-land {
+  fill: var(--smp-green);
+  stroke: var(--smp-coast);
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+  pointer-events: visibleFill;
+  transition: fill 140ms ease, stroke 140ms ease, stroke-width 140ms ease;
+}
+
+/* Hover only changes the island under the mouse. */
+.smp-land:hover {
+  fill: var(--smp-hover);
+  stroke: var(--smp-hover-stroke);
+  stroke-width: 1.25;
+}
+
+/* Let the mouse reach the island even when a label is above it. */
+.smp-water, .smp-map .smp-context, .smp-labels {
+  pointer-events: none;
+}
+.smp-labels text {
+  font: 600 14px 'Segoe UI', sans-serif;
+  fill: var(--smp-ink);
+  stroke: var(--smp-context);
+  stroke-width: 1.6;
+  stroke-opacity: 0.9;
+  paint-order: stroke fill;
+  stroke-linejoin: round;
+}
+@media (prefers-reduced-motion: reduce) {
+  .smp-land { transition: none; }
+}
+
+/* Keep the existing page layout working. */
 .smp-page {
   width: 100%; min-height: 100svh; box-sizing: border-box;
   padding: clamp(18px, 3vw, 42px); text-align: left;
   background: var(--smp-context); color: var(--smp-ink);
-  font-family: 'Montserrat', 'Segoe UI', sans-serif;
-  font-size: 14px; line-height: 1.6;
+  font: 14px/1.6 'Montserrat', 'Segoe UI', sans-serif;
 }
 .smp-page .smp-page-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
 .smp-page .smp-subtitle { color: #4b716e; font-size: 14px; margin: 0 0 6px; }
@@ -38,65 +75,15 @@
 .smp-page a { color: #275c6b; text-decoration: underline; text-underline-offset: 4px; }
 .smp-page-header > a { flex-shrink: 0; font-size: 12px; }
 .smp-page a:focus-visible { outline: 3px solid #226e9c; outline-offset: 5px; }
-.smp-map { margin: 0; overflow: hidden; border: 1px solid #bacfc8; border-radius: 12px; background: var(--smp-context); box-shadow: 0 12px 36px #20455212; }
-.smp-map > svg { display: block; width: 100%; height: auto; aspect-ratio: 14 / 9; }
-.smp-map .smp-context { fill: var(--smp-context); }
-.smp-water { pointer-events: none; }
-.smp-water-base { fill: var(--smp-blue); stroke: none; }
-.smp-decoration { pointer-events: none; }
-.smp-land-patch { fill-opacity: var(--smp-patch-opacity); stroke-width: var(--smp-patch-edge-width); stroke-opacity: var(--smp-patch-edge-opacity); stroke-linejoin: round; paint-order: stroke fill; }
-.smp-land-patch-dark { fill: var(--smp-green-dark); stroke: var(--smp-green-dark); }
-.smp-land-patch-light { fill: var(--smp-green-light); stroke: var(--smp-green-light); }
-.smp-land-patch-mid { fill: var(--smp-green-mid); stroke: var(--smp-green-mid); }
-.smp-water-patch { fill-opacity: var(--smp-water-patch-opacity); stroke: var(--smp-blue-light); stroke-opacity: 0.06; stroke-width: 3; stroke-linejoin: round; }
-.smp-water-patch-light, .smp-water-patch-mid { fill: var(--smp-blue-light); }
-.smp-water-patch-dark { fill: var(--smp-blue-deep); }
-.smp-land-washes { opacity: var(--smp-land-wash-opacity); }
-.smp-water > .smp-decoration { opacity: var(--smp-water-wash-opacity); }
-.smp-water-shore-inner { stroke: var(--smp-shallows); stroke-width: var(--smp-shore-width); stroke-opacity: var(--smp-shore-opacity); stroke-linejoin: round; }
-.smp-coast-inner { stroke: var(--smp-green-light); stroke-width: 2; stroke-opacity: 0.35; }
-.smp-paper-grain { opacity: var(--smp-grain-opacity); mix-blend-mode: multiply; }
-.smp-island-art:has(.smp-land:hover) .smp-land-washes { opacity: 0.45; }
-.smp-island-art:has(.smp-land[data-selected="true"]) .smp-land-washes { opacity: 0.55; }
-.smp-land-washes { transition: opacity 140ms ease; }
-.smp-land { fill: var(--smp-green); stroke: var(--smp-coast); stroke-width: 0.8; stroke-linejoin: round; cursor: pointer; pointer-events: visibleFill; transition: fill 140ms ease, stroke 140ms ease, stroke-width 140ms ease; }
-.smp-land:hover { fill: var(--smp-hover); stroke: var(--smp-selected-stroke); stroke-width: 1.25; }
-.smp-land[data-selected="true"] { fill: var(--smp-selected); stroke: var(--smp-selected-stroke); stroke-width: 1.6; }
-.smp-land[data-selected="true"]:hover { fill: var(--smp-hover); }
-.smp-land:focus-visible { outline: none; stroke: var(--smp-selected-stroke); stroke-width: 2.5; }
-/* Highlight the coastline instead of showing a focus box. */
-.smp-map .smp-land:focus { outline: none !important; box-shadow: none; }
-.smp-labels { pointer-events: none; }
-.smp-labels text { font: 600 14px 'Segoe UI', sans-serif; letter-spacing: 0; fill: var(--smp-ink); stroke: var(--smp-context); stroke-width: 1.6; stroke-opacity: 0.9; paint-order: stroke fill; stroke-linejoin: round; }
-.smp-labels text[data-major="true"] { font-family: Georgia, serif; font-weight: 600; letter-spacing: 0.3px; }
-.smp-map .smp-art-note { margin: 0; padding: 0 18px 12px; max-width: none; font-size: 10px; color: var(--smp-ink); background: var(--smp-context); }
-.smp-map > svg { touch-action: none; cursor: grab; user-select: none; }
-.smp-map > svg.smp-dragging, .smp-dragging .smp-land { cursor: grabbing; }
-.smp-map .smp-context, .smp-compass { pointer-events: none; }
-.smp-map-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 18px; background: var(--smp-context); color: var(--smp-ink); font-size: 12px; }
-.smp-map-toolbar button { font: inherit; color: var(--smp-ink); background: transparent; border: 1px solid var(--smp-coast); border-radius: 5px; padding: 6px 12px; cursor: pointer; flex-shrink: 0; }
-.smp-map-toolbar button:focus-visible { outline: 2px solid var(--smp-selected-stroke); outline-offset: 3px; }
-@media (prefers-reduced-motion: reduce) { .smp-land, .smp-land-washes { transition: none; } }
-.smp-compass { fill: var(--smp-ink); stroke: var(--smp-ink); stroke-width: 1; }
-.smp-compass text { font: 14px Georgia, serif; stroke: none; }
-.smp-map-caption { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 22px; padding: 13px 18px; background: var(--smp-context); color: #3c5b58; font: 12px/1.5 'Montserrat', 'Segoe UI', sans-serif; border-top: 1px solid #bacfc8; }
-.smp-map-caption span { display: inline-flex; align-items: center; gap: 7px; }
-.smp-map-caption span:last-child { margin-left: auto; }
-.smp-map-caption i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; border: 1px solid #315c6033; }
-.smp-key-land { background: var(--smp-green); }
-.smp-key-water { background: var(--smp-blue); }
-.smp-key-context { background: var(--smp-context); }
 .smp-page-footer { display: flex; justify-content: space-between; gap: 28px; margin-top: 18px; color: #59716b; font-size: 11px; }
 .smp-page-footer p { flex: 1; }
 .smp-empty { padding: 60px 24px; color: var(--smp-ink); text-align: center; }
 @media (max-width: 640px) {
   .smp-page .smp-page-header { align-items: flex-start; flex-direction: column; gap: 12px; }
-  .smp-map-toolbar { align-items: flex-start; }
-  .smp-map-toolbar span { max-width: 24ch; }
   .smp-page-footer { flex-direction: column; gap: 10px; }
 }
 
-/* Let the map fill the screen in presentation mode. */
+/* Fill the screen when we only want to show the map. */
 #root:has(> .smp-page--presentation) {
   width: 100%; max-width: none; margin: 0; border: 0;
 }
@@ -104,18 +91,24 @@
   padding: 0; height: 100svh; height: 100dvh; min-height: 0; overflow: hidden;
 }
 .smp-map.smp-map--presentation {
-  position: relative; width: 100%; height: 100%; border: 0; border-radius: 0; box-shadow: none;
+  width: 100%; height: 100%; border: 0; border-radius: 0;
 }
 .smp-map--presentation > svg { width: 100%; height: 100%; aspect-ratio: auto; }
-.smp-map .smp-map-toolbar--floating {
-  position: absolute; top: 14px; right: 16px; z-index: 1; padding: 0; background: transparent;
+
+/* Keep the source credit visible even in presentation mode. */
+.smp-map .smp-map-credit {
+  display: block;
+  width: fit-content;
+  margin: 4px 12px 4px auto;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--smp-ink);
+  background: var(--smp-context);
+  padding: 2px 4px;
 }
-.smp-map-toolbar--floating button {
-  padding: 5px 9px; font-size: 11px; background: var(--smp-context); border-color: #58765a55; opacity: 0.8;
-}
-.smp-map-toolbar--floating button:hover, .smp-map-toolbar--floating button:focus-visible { opacity: 1; }
-.smp-page .smp-map-credit {
-  position: absolute; bottom: 8px; right: 12px; z-index: 1; font-size: 10px;
-  line-height: 1.4; color: var(--smp-ink); background: var(--smp-context);
-  padding: 2px 4px; text-decoration: none;
+.smp-map--presentation .smp-map-credit {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  margin: 0;
 }
