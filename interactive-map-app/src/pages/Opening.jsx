@@ -21,7 +21,7 @@ function Opening() {
             map,
             document.querySelector('#skip-intro'),
             introConfig,
-            () => navigate('/')
+            () => navigate('/islands')                                              // I updated this to the islands directory
         );
 
         // Step 3: Clean up when React unmounts Opening

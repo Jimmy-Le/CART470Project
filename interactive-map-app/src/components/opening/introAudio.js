@@ -1,8 +1,9 @@
-import bellUrl from '../../assets/Audio/Opening/BELL.mp3?url';
-import windUrl from '../../assets/Audio/Opening/Wind.mp3?url';
-import riverUrl from '../../assets/Audio/Opening/River.mp3?url';
-import seagullUrl from '../../assets/Audio/Opening/Seagull.mp3?url';
-import carUrl from '../../assets/Audio/Opening/CarPassing.mp3?url';
+
+import bellUrl from '../../assets/audio/Opening/BELL.mp3?url';
+import windUrl from '../../assets/audio/Opening/Wind.mp3?url';
+import riverUrl from '../../assets/audio/Opening/River.mp3?url';
+import seagullUrl from '../../assets/audio/Opening/Seagull.mp3?url';
+import carUrl from '../../assets/audio/Opening/CarPassing.mp3?url';
 
 const AUDIO_URLS = {
     'BELL.mp3': bellUrl,

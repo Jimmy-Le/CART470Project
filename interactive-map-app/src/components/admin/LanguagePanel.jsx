@@ -12,7 +12,7 @@ const categories = [
 
 
 
-export default function LanguagePanel({island, language, onLanguageChange, onUpdateLanguage, onClose, onAddConnection, onUpdateConnection, onRemoveConnection}){
+export default function LanguagePanel({island, language, onLanguageChange, onUpdateLanguage, onClose, onAddConnection, onUpdateConnection, onRemoveConnection, islands}){
 	const availableLanguages = ["EN", "FR", "IN"];
 
 
@@ -20,6 +20,7 @@ export default function LanguagePanel({island, language, onLanguageChange, onUpd
 		name: "",
 		description: "",
 		connections: [],
+		enabled: true,
 	};
 
 	return (
@@ -44,6 +45,12 @@ export default function LanguagePanel({island, language, onLanguageChange, onUpd
 				</div>
 
 				<label className="mt-4 flex flex-col">
+					<label className="text-left p-1">Enabled</label>
+					<input type="checkbox" checked={languageData.enabled} onChange={(event) => onUpdateLanguage(island._id, language, "enabled", event.target.checked)}/>
+				</label>
+				
+
+				<label className="mt-4 flex flex-col">
 					<label className="text-left p-1">Island Name</label>
 					<input className="rounded-lg border border-gray-300 px-3 py-2 text-left w-50" value={languageData.name} onChange={(event) => onUpdateLanguage(island._id, language, "name", event.target.value)}/>
 				</label>
@@ -54,7 +61,7 @@ export default function LanguagePanel({island, language, onLanguageChange, onUpd
 				</label>
 
 				<div className="flex-1 overflow-y-auto p-6">
-					<ConnectionTable connections={languageData.connections} islandId={island._id} language={language} categories={categories} onAddConnection={onAddConnection} onUpdateConnection={onUpdateConnection} onRemoveConnection={onRemoveConnection}/>				
+					<ConnectionTable connections={languageData.connections} islandId={island._id} language={language} categories={categories} onAddConnection={onAddConnection} onUpdateConnection={onUpdateConnection} onRemoveConnection={onRemoveConnection} islands={islands}/>				
 				</div>
 				<button type="button" onClick={onClose} className="w-50 mt-6 rounded bg-blue-600 px-4 py-2 text-white self-end">
 					Done

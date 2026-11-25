@@ -20,6 +20,7 @@ export default function WaterIsland({ island, onSelect }) {
   const stop = () => {
     if (audio.current) { audio.current.pause(); audio.current.currentTime = 0; }
   };
+
   return <button type="button" className="island" data-island={island.id}
     style={{ left: island.x, top: island.y, width: island.width, height: island.height }}
     aria-label={`${island.name} — show island information`} aria-pressed="false"

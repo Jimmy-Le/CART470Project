@@ -1,6 +1,8 @@
 import express from "express";
 import multer from "multer";
 import Image from "../models/Image.mjs";
+import { uploadAssetToDrive, getAssetStreamFromDrive, listImagesFromDrive } from '../driveService.mjs';
+
 
 
 const router = express.Router();
@@ -10,25 +12,12 @@ const upload = multer({ storage: multer.memoryStorage()});
 // Returns image metadata for the picker
 router.get("/", async (req, res) => {
   try {
-    const images = await Image.find(
-      {},
-      {
-        name: 1,
-        fileName: 1,
-        contentType: 1,
-        createdAt: 1,
-      }
-    );
+    // const images = await Image.find().sort({createdAt: -1});
 
-    const formattedImages = images.map((image) => ({
-      _id: image._id.toString(),
-      name: image.name,
-      fileName: image.fileName,
-      contentType: image.contentType,
-      url: `/api/images/${image._id.toString()}`,
-    }));
+    const images = await listImagesFromDrive();
+ 
+    res.json(images);
 
-    res.json(formattedImages);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Could not load images" });
@@ -39,14 +28,11 @@ router.get("/", async (req, res) => {
 // Returns the actual image file
 router.get("/:id", async (req, res) => {
   try {
-    const image = await Image.findById(req.params.id);
+    const {stream, mimeType} = await getAssetStreamFromDrive(req.params.id);
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    stream.pipe(res);
 
-    if (!image) {
-      return res.status(404).json({ error: "Image not found" });
-    }
-
-    res.set("Content-Type", image.contentType);
-    res.send(image.data);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Could not load image" });
@@ -62,49 +48,21 @@ router.post("/", upload.single("image"), async (req, res) => {
       return res.status(400).json({ error: "No image provided" });
     }
 
+    const driveFile = await uploadAssetToDrive(req.file);
+
+  
     const image = await Image.create({
-      name: req.body.name || file.originalname,
-      fileName: file.originalname,
-      contentType: file.mimetype,
-      data: file.buffer,
+      name: driveFile.name,
+      driveFileId: driveFile.id,
+      mimeType: driveFile.mimeType,
     });
 
-    res.status(201).json({
-      _id: image._id.toString(),
-      name: image.name,
-      url: `/api/images/${image._id.toString()}`,
-    });
+    res.status(201).json(image);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Could not upload image" });
   }
 });
 
-
-// UPDATE an existing island
-router.put("/:id", async (req, res) => {
-  try {
-    const { _id, ...islandData } = req.body;
-
-    const updatedIsland = await Island.findByIdAndUpdate(
-      req.params.id,
-      { $set: islandData },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedIsland) {
-      return res.status(404).json({ error: "Island or Image not found" });
-    }
-
-    res.json(updatedIsland);
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Could not update island",
-      details: error.message,
-    });
-  }
-});
 
 export default router;
