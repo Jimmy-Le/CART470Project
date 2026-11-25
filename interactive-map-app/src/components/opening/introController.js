@@ -146,11 +146,24 @@ export function startIntro(
     const audio = createIntroAudio(config.audio);
     const revealedIds = new Set(['montreal']);
     const connectionLines = createConnectionLines(map, config.connections);
+    let exploreTimer;
+    let leaving = false;
+    const exploreFadeMs = config.audio?.ambient?.exploreFadeOutMs ?? 650;
+    function exploreWithAudioFade() {
+        if (leaving || state !== 'completed') return;
+        leaving = true;
+        audio.stop(exploreFadeMs);
+        // Give the fade time to finish before the React route unmounts Opening.
+        exploreTimer = setTimeout(() => {
+            exploreTimer = undefined;
+            onExplore();
+        }, Math.max(0, exploreFadeMs));
+    }
     const overlay = createIntroOverlay(
         document.querySelector('#intro-overlay'),
         config.overlay,
         begin,
-        onExplore
+        exploreWithAudioFade
     );
     const attract = document.querySelector('#intro-attract');
     const beginButton = attract.querySelector('button');
@@ -199,6 +212,7 @@ export function startIntro(
 
         state = 'completed';
         clearTimeout(timer);
+        clearTimeout(windTimer);
         windTimer = undefined;
         map.off('moveend', cameraComplete);
         map.stop();
@@ -239,8 +253,11 @@ export function startIntro(
 
     function dispose() {
         state = 'disposed';
+        clearTimeout(exploreTimer);
+        exploreTimer = undefined;
         container.classList.remove('intro-idle');
         clearTimeout(timer);
+        clearTimeout(windTimer);
         windTimer = undefined;
         connectionLines.dispose();
         audio.dispose();
@@ -281,6 +298,9 @@ export function startIntro(
 
     function begin() {
         if (state !== 'idle' && state !== 'completed') return;
+        clearTimeout(exploreTimer);
+        exploreTimer = undefined;
+        leaving = false;
         state = 'waiting';
         language.hide();
 
@@ -291,6 +311,7 @@ export function startIntro(
         overlay.hide();
         attract.hidden = true;
         clearTimeout(timer);
+        clearTimeout(windTimer);
         windTimer = undefined;
         connectionLines.clear();
         revealedIds.clear();
@@ -308,8 +329,33 @@ export function startIntro(
         if (hasLoaded || map.loaded()) ready();
     }
 
+    // Both starting actions share the same marker ripple animation.
+    function triggerStartRipple() {
+        if (motionPreference.matches) return;
+
+        // During the idle scene, Montréal is the only visible island marker.
+        const marker = container.querySelector('.island-marker:not([hidden])');
+        if (!marker) return;
+
+        // Allow the ripple to start afresh even if the class was left on the marker.
+        marker.classList.remove('intro-click-ripple');
+        marker.style.setProperty('--intro-click-ripple-duration', `${config.clickRippleMs ?? 800}ms`);
+        void marker.offsetWidth;
+
+        const onRippleEnd = (event) => {
+            if (event.target !== marker || event.animationName !== 'intro-click-ripple') return;
+            marker.classList.remove('intro-click-ripple');
+            marker.style.removeProperty('--intro-click-ripple-duration');
+            marker.removeEventListener('animationend', onRippleEnd);
+        };
+        marker.addEventListener('animationend', onRippleEnd);
+        marker.classList.add('intro-click-ripple');
+    }
+
     function beginFromAttract() {
-        if (state === 'idle') begin();
+        if (state !== 'idle') return;
+        triggerStartRipple();
+        begin();
     }
 
     function beginFromMarker(event) {
@@ -319,15 +365,6 @@ export function startIntro(
         // Capture activation before the normal marker-selection handler runs.
         event.preventDefault();
         event.stopImmediatePropagation();
-
-        marker.addEventListener('animationend', (event) => {
-            if (event.animationName === 'intro-click-ripple') {
-                marker.classList.remove('intro-click-ripple');
-                marker.style.removeProperty('--intro-click-ripple-duration');
-            }
-        }, { once: true });
-        marker.classList.add('intro-click-ripple');
-
         beginFromAttract();
     }
 

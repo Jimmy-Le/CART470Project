@@ -222,16 +222,19 @@ h1,h2{
 }
 
 /* Island Component Css */
-    .island-blue {
-      display: inline-block;
-      overflow: hidden;
-      border-radius: 15px;
+      .island-marker-icon>div,
+      .island-marker-icon>div>div,
+      .island-marker-icon .island-blue {
+      display: block;
+      width:100%;
+      height:100%;
     }
 
-    .island-blue img {
+    .island-marker-icon .island-blue img {
       display: block;
-      width: 300px;
-      max-width: 100%;
+      width:100%;
+      height:100%;
+      object-fit: contain;
       transition: transform 0.3s ease, filter 0.3s ease;
       cursor: pointer;
     }
@@ -239,6 +242,12 @@ h1,h2{
     .island-blue:hover img {
       transform: scale(1.08);
       filter: brightness(1.3);
+    }
+
+    .island-blue p{
+        transform: translate(-50%, -50%);
+        font-family:Georgia, 'Times New Roman', Times, serif !important;
+        font-weight: bold;
     }
 
     #focusedJustIsland{
@@ -287,4 +296,9 @@ h1,h2{
       height: 60%;
       margin-top:15px;
       margin-left: 10%;
+    }
+
+    .languagePicker{
+      background-color:blue;
+
     }

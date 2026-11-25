@@ -85,6 +85,21 @@ export const introConfig = {
         finalFadeOutMs: 900,
         skipFadeOutMs: 120,
         carDelayMs: 300,
+
+        // Continuous low-volume Wind and River after the introduction.
+        // Volume values are Web Audio gain values, not percentages.
+        ambient: {
+            windVolume: 0.2,
+            riverVolume: 0.45,
+
+            windCrossfadeMs: 1500,
+            riverCrossfadeMs: 1500,
+
+            transitionMs: 1800,
+            replayFadeOutMs: 450,
+            stopFadeMs: 650,
+            exploreFadeOutMs: 650
+        },
     },
 
 
