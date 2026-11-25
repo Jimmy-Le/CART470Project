@@ -1,16 +1,32 @@
 import island from "../assets/blue.png"
 import sound from "../assets/audio/seagulls.mp3"
-import {useRef } from "react";
+import { useRef, useState } from "react"
+import svgIsland from "../assets/green.png"
+
+
 
 // TODO: Use Image and Audio from database
-function IslandComponent() {
-  const audio = useRef(null)
+function IslandComponent({
+  //props received by the parent (in this case, mapLeaflet)
+  audioClip = sound,
+  islandName = "placeholder",
+  islandWatercolor = island,
+  islandSVG = svgIsland,
+  imageSize,
+ 
 
+}) {
+
+const [displayImage, setDisplayImage] = useState([island]);
+
+ const audio = useRef(null);
+  
+  
   function playAudio()
   {
     if(!audio.current)
     {
-      audio.current = new Audio(sound);
+      audio.current = new Audio(audioClip);
     }
     audio.current.play();
   }
@@ -24,24 +40,21 @@ function IslandComponent() {
     }
   }
 
-  function togglePreview()
-  {
-    let islandPreviewClass = document.getElementById("focusedJustIsland")
-    if(islandPreviewClass.style.display == "none"){
-      islandPreviewClass.style.display = "flex";
-    }
-    else{
-      islandPreviewClass.style.display = "none";
-    }
+  function toggleIslandFocus(){
+    //switches to the opposite image when clicked
+    setDisplayImage((current) => current === islandWatercolor ? islandSVG : islandWatercolor);
   }
 
+  let resizeImage = "w-" + imageSize;
+
   return (
-      <div className="fixed top-1/3 place-self-center">
+      <div>
         
-        <a className="island-blue" onMouseEnter={playAudio} onMouseLeave={pauseAudio} onClick={togglePreview}> {/*href="https://wastescapes.com/as-the-gull-flies/"*/}
-          <img src={island} alt="blue watercolor painting"/> 
+        <a className="island-blue relative text-center" onMouseEnter={playAudio} onMouseLeave={pauseAudio} onClick={toggleIslandFocus}> {/*href="https://wastescapes.com/as-the-gull-flies/"*/}
+          <img src={displayImage} alt="blue watercolor painting"/> 
+          <p className="absolute top-1/2 left-1/2">{islandName}</p>
         </a>
-        <audio id="hoverAudio" src={sound} loop></audio>
+        <audio id="hoverAudio" src={audio} loop></audio>
         <div id="focusedJustIsland"></div>
       </div>
       

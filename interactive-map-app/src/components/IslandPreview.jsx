@@ -5,9 +5,9 @@ import IslandThumbnail from "./IslandThumbnail.jsx";
 import blueIsland from "../assets/blue.png";
 import testIsland from "../assets/TestIsland.png";
 
-function IslandPreview({ onClose, island }) {
+function IslandPreview({ onClose, title = "Seagull Island", island }) {
 
-  const title = "Seagull Island";
+
 
   const tags = [
     {id: "t1", color: "#D87174", name: "Threats"},

@@ -1,10 +1,11 @@
+import { attachPan } from './placement/pan.js';
 import { createWaterSimulation } from './engine/waterSimulation.js';
 import { createPathfinder } from './engine/pathfinding.js';
 import { measure, at, routeName } from './engine/routeMath.js';
 import { createNameAnimation } from './engine/nameAnimation.js';
 import { serializeCurrents, normalizeCurrents } from './data/currentStorage.js';
 // Adapted from Tianshun's water prototype. One isolated engine per mounted map.
-export function createWaterMap(root, { islands: islandData, currents = [], onSelect = () => {}, onStateChange = () => {}, onCurrentsChange = () => {} } = {}) {
+export function createWaterMap(root, { islands: islandData, currents = [], view, onSelect = () => {}, onStateChange = () => {}, onCurrentsChange = () => {} } = {}) {
 const abort = new AbortController();
 const signal = abort.signal;
 let frameId = 0;
@@ -25,13 +26,14 @@ const H = 800;
 const CELL = 8;
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const camera = { x: 600, y: 400, tx: 600, ty: 400, scale: 1 };
+const camera = { x: 600, y: 400, tx: 600, ty: 400, scale: 1, ...view?.camera };
+attachPan(scene, camera, signal);
 
 let routes = [];
 let selected = -1;
 let editing = false;
 let start = null;
-let paused = reduced;
+let paused = view?.paused ?? reduced;
 let last = 0;
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -137,7 +139,12 @@ function togglePause() {
   updateUI();
 };
 
+let previousCenter = null;
 function overview() {
+  if (previousCenter) {
+    hideName();
+    return;
+  }
   camera.tx = 600;
   camera.ty = 400;
 };
@@ -150,6 +157,16 @@ window.addEventListener('keydown', e => {
 }, { signal });
 
 function hideName() {
+  clearIsland();
+  if (previousCenter) {
+    camera.tx = previousCenter.x;
+    camera.ty = previousCenter.y;
+    previousCenter = null;
+    onSelect(null);
+  }
+}
+
+function clearIsland() {
   names.forEach(name => name.hide());
   islands.forEach(el => {
     el.classList.remove('active');
@@ -161,9 +178,10 @@ function focusIsland(id = islandData[0]?.id) {
   const index = islandData.findIndex(item => item.id === id);
   if (index < 0) return;
   const data = islandData[index];
-  hideName();
-  camera.tx = data.camera?.x ?? data.x + data.width / 2;
-  camera.ty = data.camera?.y ?? data.y + data.height / 2;
+  previousCenter ??= { x: camera.tx, y: camera.ty };
+  clearIsland();
+  camera.tx = data.x + data.width / 2;
+  camera.ty = data.y + data.height / 2;
   names[index].reveal();
   islands[index].classList.add('active');
   islands[index].setAttribute('aria-pressed', 'true');
@@ -179,6 +197,10 @@ function mapPoint(e) {
     y: (e.clientY - r.top) / camera.scale
   };
 }
+
+scene.addEventListener('click', event => {
+  if (previousCenter && !editing && !event.target.closest('.island, .controls')) hideName();
+}, { signal });
 
 world.addEventListener('click', e => {
   if (e.target.closest('.island')) return;
@@ -261,10 +283,10 @@ const simulation = createWaterSimulation({ ctx, obstacles, grid, blocked, cellPo
 });
 const { rebuildField, draw, velocity } = simulation;
 
-function updateResolution() {
+function updateResolution(scale = camera.scale) {
   const ratio = Math.max(
     1,
-    Math.min(3, camera.scale * (globalThis.devicePixelRatio || 1))
+    Math.min(3, scale * (globalThis.devicePixelRatio || 1))
   );
 
   const width = Math.round(W * ratio);
@@ -281,11 +303,11 @@ function updateResolution() {
 
 function resize() {
   const rect = scene.getBoundingClientRect();
-  const panel = root.querySelector('.controls').getBoundingClientRect();
+  // Reserve the controller's maximum height so status text cannot shift the map.
 
   camera.scale = Math.min(
     (rect.width - 24) / W,
-    (rect.height - panel.height - 44) / H
+    (rect.height * .6 - 44) / H
   );
 
   fitScale = Math.max(.12, camera.scale);
@@ -300,11 +322,11 @@ function frame(t) {
 
   const k = reduced ? 1 : 1 - Math.exp(-dt * 4);
 
+  camera.scale += (fitScale * zoom - camera.scale) * k;
   camera.x += (camera.tx - camera.x) * k;
   camera.y += (camera.ty - camera.y) * k;
 
-  const available = scene.clientHeight -
-    root.querySelector('.controls').offsetHeight - 36;
+  const available = scene.clientHeight * .6 - 36;
 
   world.style.left = `${scene.clientWidth / 2}px`;
   world.style.top = `${available / 2}px`;
@@ -337,9 +359,11 @@ function loadCurrents(records) {
   start = null;
 }
 loadCurrents(currents);
+if (routes.some(r => r.id === view?.selected)) selected = view.selected;
 rebuildField();
 updateUI();
 resize();
+
 
 window.addEventListener('resize', resize, { signal });
 const observer = new ResizeObserver(resize);
@@ -453,6 +477,7 @@ window.addEventListener('keydown', (event) => {
   }
 }, { capture: true, signal });
 return {
+  getView: () => ({ camera: { ...camera }, paused, selected }),
   focusIsland,
   hideName,
   toggleAdd, selectCurrent, updateCurrent, reverseCurrent, deleteCurrent, togglePause, overview,
@@ -471,8 +496,7 @@ return {
   },
   setZoom(value) {
     zoom = Number.isFinite(value) ? Math.max(.7, Math.min(2, value)) : 1;
-    camera.scale = fitScale * zoom;
-    updateResolution();
+    updateResolution(fitScale * zoom);
   },
   destroy() {
     disposed = true;

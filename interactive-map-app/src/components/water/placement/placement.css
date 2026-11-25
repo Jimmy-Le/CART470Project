@@ -1,0 +1,12 @@
+.water-map-scene .world { cursor: grab; touch-action: none; user-select: none; }
+.water-map-scene.panning, .water-map-scene.panning * { cursor: grabbing; }
+.water-map-scene.placing-island { cursor: crosshair; }
+.island-placement code { overflow-wrap: anywhere; }
+.water-map-scene.placing-island .world, .water-map-scene.placing-island .island,
+.water-map-scene.editing .world { cursor: crosshair; }
+.water-map-scene .island-placement { display:flex; align-items:center; flex-wrap:wrap; gap:6px; flex-basis:100%; }
+.island-placement small { flex-basis:100%; }
+.water-map-scene .controls { max-height:40%; overflow:auto; }
+@media (max-width:1250px) {
+  .water-map-page .team-zoom-controls { inset:12px 12px auto auto; }
+}
