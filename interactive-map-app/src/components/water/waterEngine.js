@@ -364,6 +364,7 @@ rebuildField();
 updateUI();
 resize();
 
+
 window.addEventListener('resize', resize, { signal });
 const observer = new ResizeObserver(resize);
 observer.observe(root);
