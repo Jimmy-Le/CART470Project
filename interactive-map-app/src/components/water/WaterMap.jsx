@@ -1,47 +1,55 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
-import blueIsland from '../../assets/blue.png';
-import gullSound from '../../assets/audio/seagulls.mp3';
-import template from './waterMap.html?raw';
-import { createWaterMap } from './waterEngine.js';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { defaultIslands } from './data/islands.js';
+import IslandPlacement from './placement/IslandPlacement.jsx';
+import WaterIsland from './WaterIsland.jsx';
+import IslandName from './IslandName.jsx';
+import CurrentControls from './CurrentControls.jsx';
+import useWaterEngine from './hooks/useWaterEngine.js';
 import './WaterMap.css';
 
-const WaterMap = forwardRef(function WaterMap({ onSelect, zoom }, ref) {
+function setInitialCamera(world) {
+  if (!world) return;
+
+  const scene = world.parentElement;
+  const { width, height } = scene.getBoundingClientRect();
+
+  // Match the engine's opening view before the water simulation starts.
+  const scale = Math.max(
+    0.12,
+    Math.min((width - 24) / 1200, (height * 0.6 - 44) / 800)
+  );
+
+  world.style.left = `${scene.clientWidth / 2}px`;
+  world.style.top = `${(scene.clientHeight * 0.6 - 36) / 2}px`;
+  world.style.transform = `scale(${scale}) translate(-600px, -400px)`;
+}
+
+const WaterMap = forwardRef(function WaterMap({ onSelect, zoom = 1, islands = defaultIslands,
+  initialCurrents, onCurrentsChange, positions, onPositionsChange }, ref) {
+  const [highlight, setHighlight] = useState(true);
   const host = useRef(null);
-  const engine = useRef(null);
-  const onSelectRef = useRef(onSelect);
-  useEffect(() => { onSelectRef.current = onSelect; }, [onSelect]);
-
+  const { engine, state, actions } = useWaterEngine(host, {
+    islands, initialCurrents, onSelect, onCurrentsChange, zoom,
+  });
   useImperativeHandle(ref, () => ({
-    focusIsland: () => engine.current?.focusIsland(),
+    focusIsland: id => engine.current?.focusIsland(id),
     hideName: () => engine.current?.hideName(),
-  }), []);
-
-  useEffect(() => {
-    const root = host.current;
-    root.innerHTML = template.replace('__BLUE_ISLAND__', blueIsland);
-    const map = createWaterMap(root, { onSelect: () => onSelectRef.current?.() });
-    engine.current = map;
-    const audio = new Audio(gullSound);
-    audio.loop = true;
-    const abort = new AbortController();
-    const stop = () => { audio.pause(); audio.currentTime = 0; };
-    const island = root.querySelector('.island');
-    island.addEventListener('mouseenter', () => {
-      // Browsers may require a first user interaction before allowing audio.
-      audio.play().catch(() => {});
-    }, { signal: abort.signal });
-    island.addEventListener('mouseleave', stop, { signal: abort.signal });
-    return () => {
-      abort.abort();
-      stop();
-      audio.removeAttribute('src');
-      map.destroy();
-      engine.current = null;
-      root.replaceChildren();
-    };
-  }, []);
-
-  useEffect(() => { engine.current?.setZoom(zoom); }, [zoom]);
-  return <div ref={host} className="water-map-scene" aria-label="Interactive island and water-current map" />;
+    getCurrents: () => engine.current?.getCurrents() ?? [],
+    // Use after an asynchronous database read; does not trigger the save callback.
+    setCurrents: records => engine.current?.setCurrents(records),
+  }), [engine]);
+  return <div ref={host} data-coast-highlight={highlight} className="water-map-scene" aria-label="Interactive island and water-current map">
+    <div className="world" id="world" ref={setInitialCamera}>
+      <canvas id="water" width="1200" height="800" aria-hidden="true" />
+      {islands.map(island => <WaterIsland key={island.id} island={island} onSelect={actions.focusIsland} />)}
+      {islands.map(island => <IslandName key={island.id} island={island} />)}
+    </div>
+    <CurrentControls state={state} actions={actions}>
+      {positions && <IslandPlacement host={host} engine={engine} positions={positions}
+        onChange={onPositionsChange} editing={state.editing} />}
+      <label><input type="checkbox" checked={highlight}
+        onChange={event => setHighlight(event.target.checked)} /> Island highlight</label>
+    </CurrentControls>
+  </div>;
 });
 export default WaterMap;

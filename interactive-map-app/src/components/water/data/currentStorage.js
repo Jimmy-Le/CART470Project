@@ -1,0 +1,30 @@
+import defaults from './currents.json';
+
+const clamp = (value, min, max, fallback) => Number.isFinite(value)
+  ? Math.max(min, Math.min(max, value)) : fallback;
+const point = p => p && Number.isFinite(p.x) && Number.isFinite(p.y)
+  && p.x >= 0 && p.x <= 1200 && p.y >= 0 && p.y <= 800;
+
+// Plain records only: never store particles, Path2D, DOM elements or animation frames.
+export function normalizeCurrents(records) {
+  if (!Array.isArray(records)) return [];
+  const ids = new Set();
+  return records.slice(0, 40).flatMap(item => {
+    if (!item || !Number.isSafeInteger(item.id) || item.id < 0 || ids.has(item.id)
+      || !point(item.a) || !point(item.b)) return [];
+    ids.add(item.id);
+    return [{ id: item.id, a: { ...item.a }, b: { ...item.b },
+      speed: clamp(item.speed, 0, 150, 35),
+      width: clamp(item.width, 20, 180, 70),
+      strength: clamp(item.strength, 0, 2, 1) }];
+  });
+}
+export function serializeCurrents(routes) {
+  return routes.map(({ id, a, b, speed, width, strength }) => ({
+    id, a: { x: a.x, y: a.y }, b: { x: b.x, y: b.y }, speed, width, strength,
+  }));
+}
+// Project JSON is the shared source of truth. Ignore browser-local drafts.
+export function loadProjectCurrents() {
+  return normalizeCurrents(defaults);
+}

@@ -9,7 +9,7 @@
   font-style: normal;
 }
 h1,h2{
-  font-family: "Montserrat", sans-serif;
+  font-family: 'Palatino Linotype', Palatino, Georgia, serif;
   font-optical-sizing: auto;
   font-weight: bold;
   font-style: normal;
@@ -222,16 +222,19 @@ h1,h2{
 }
 
 /* Island Component Css */
-    .island-blue {
-      display: inline-block;
-      overflow: hidden;
-      border-radius: 15px;
+      .island-marker-icon>div,
+      .island-marker-icon>div>div,
+      .island-marker-icon .island-blue {
+      display: block;
+      width:100%;
+      height:100%;
     }
 
-    .island-blue img {
+    .island-marker-icon .island-blue img {
       display: block;
-      width: 300px;
-      max-width: 100%;
+      width:100%;
+      height:100%;
+      object-fit: contain;
       transition: transform 0.3s ease, filter 0.3s ease;
       cursor: pointer;
     }
@@ -241,8 +244,61 @@ h1,h2{
       filter: brightness(1.3);
     }
 
+    .island-blue p{
+        transform: translate(-50%, -50%);
+        font-family:Georgia, 'Times New Roman', Times, serif !important;
+        font-weight: bold;
+    }
+
     #focusedJustIsland{
       display:none;
       margin: 0 auto;
       margin-top: 10px;
+    }
+
+
+    /* Base styles for the coordinate form. For the current Lines page look,
+       check presentation-theme.css too: its #root selectors override these.
+       The toolbar and file buttons also have inline styles in their JSX files. */
+    #connectionsEditor input{
+      width: 25%;
+      margin: 0px 10px;
+      border: solid, black, 0.5px;
+      border-radius: 5px;
+    }
+    #connectionsEditor label{
+      color: black;
+    }
+
+    #connectionsEditor div{
+      width: 30%;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    #connectionsEditor h2{
+      margin-bottom:5px;
+    }
+
+    #connectionsEditor{
+      text-align:left;
+      display:flex;
+      justify-content:space-around;
+      flex-wrap:wrap;
+      background-color: rgb(243, 230, 173);
+    }
+
+    #addLineButton{
+      background-color: #5e4fb1;
+      color: white;
+      border-radius: 10px;
+      width: 80%;
+      height: 60%;
+      margin-top:15px;
+      margin-left: 10%;
+    }
+
+    .languagePicker{
+      background-color:blue;
+
     }
