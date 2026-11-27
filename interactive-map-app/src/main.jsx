@@ -18,6 +18,7 @@ import IslandsPageBase from './pages/IslandsPageBase.jsx';
 import Admin from './pages/Admin.jsx';
 import Opening from './pages/Opening.jsx';
 import ExperimentMap from './components/click_experiment/ExperimentMap.jsx';
+import StylizedMapPage from './components/stylizedMapPreview/page/StylizedMapPage.jsx';
 
 //for the disappearing components stuff
 
@@ -38,6 +39,7 @@ createRoot(document.getElementById('root')).render(
 
     <BrowserRouter>
       <Routes>
+        <Route path="/real-map" element={<StylizedMapPage />} />
         <Route path="/credits/edit" element={
           <iframe title="Credits editor" src={import.meta.env.BASE_URL + 'credits/editor.html'}
             style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', border: 0 }} />
