@@ -35,6 +35,16 @@ export default function StylizedMapPreview({
   showLabels = true,
   presentationOnly = false,
 }) {
+  const [folioOpen, setFolioOpen] = useState(false);
+  const exploreRef = useRef(null);
+  const closeRef = useRef(null);
+  useEffect(() => {
+    if (folioOpen) closeRef.current?.focus({preventScroll:true});
+  }, [folioOpen]);
+  function closeFolio() {
+    setFolioOpen(false);
+    requestAnimationFrame(() => exploreRef.current?.focus({preventScroll:true}));
+  }
   const [focused, setFocused] = useState(null);
   const [phase, setPhase] = useState('visible');
   const [fontReady, setFontReady] = useState(false);
@@ -161,6 +171,7 @@ export default function StylizedMapPreview({
   }, [hasMap]);
 
   function moveTo(next) {
+    setFolioOpen(false);
     const id = next?.id ?? null;
     if (destination.current === id && !gestureCamera.current && !next) return;
     if (gestureCamera.current) setFocused(gestureCamera.current);
@@ -211,6 +222,7 @@ export default function StylizedMapPreview({
   const dy = focused?.dy ?? 0;
 
 
+  const feature = folioOpen && islands.features.find(f => f.properties.projectIslandId === 'deslauriers');
   function selectIsland(id, bounds) {
     const zoom = Math.min(2048, 0.62 * Math.min(WIDTH / bounds.width, HEIGHT / bounds.height));
     moveTo({
@@ -220,7 +232,9 @@ export default function StylizedMapPreview({
     });
   }
   return (
-    <figure className={`smp-map ${presentationOnly ? 'smp-map--presentation' : ''} ${className}`}>
+    <figure onKeyDownCapture={e => {
+      if (e.key === 'Escape' && folioOpen) { e.stopPropagation(); closeFolio(); }
+    }} className={`smp-map ${folioOpen ? 'smp-reading' : ''} ${presentationOnly ? 'smp-map--presentation' : ''} ${className}`}>
       <svg ref={svgRef} onClickCapture={e => { if (performance.now() < blockClick.current) e.stopPropagation(); }} onClick={event => { if (!event.target.closest("[data-island-id]")) moveTo(null); }}
         onKeyDown={event => { if (event.key === "Escape") moveTo(null); }}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="group" aria-label="Map of the Hochelaga Archipelago">
@@ -264,6 +278,36 @@ export default function StylizedMapPreview({
         </g>
       </svg>
 
+      {focused?.id === 'deslauriers' && phase === 'visible' && !folioOpen &&
+        <button type="button" ref={exploreRef} className="smp-explore" onClick={() => setFolioOpen(true)}>
+          Explorer l’île <span aria-hidden="true">↗</span>
+        </button>}
+      {feature && <aside className="smp-folio" aria-labelledby="smp-folio-title" lang="fr">
+        <div className="smp-folio-top"><i>Archipel d’Hochelaga</i>
+          <button type="button" ref={closeRef} onClick={closeFolio}>Fermer ×</button></div>
+        <h2 id="smp-folio-title">Île Deslauriers</h2>
+        <i lang="en">Seagull Island</i>
+        <svg viewBox="0 0 340 220" role="img" aria-label="Contour de l’île Deslauriers et rose des vents">
+          <defs><pattern id="smp-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(28)">
+            <rect width="5" height="5" fill="#c3bd91"/><path d="M0 0V5" stroke="#696949" strokeWidth=".9"/>
+          </pattern></defs>
+          <rect x="2" y="2" width="336" height="216" fill="#e7dcc0" stroke="#a49b78"/>
+          <g stroke="#8b7259" strokeWidth=".6" opacity=".42">
+            {[0,22.5,45,67.5,90,112.5,135,157.5].map(a =>
+              <path key={a} d="M-450 0H450" transform={`translate(50 48) rotate(${a})`}/>)}
+          </g>
+          <path d={geometryPath(feature.geometry, fitProjection([feature],340,220,45))} fill="url(#smp-hatch)" stroke="#4a513d" strokeWidth="1.6"/>
+          <g transform="translate(50 48)" fill="#884d37" stroke="#884d37" strokeWidth=".7">
+            <circle r="14" fill="#eee4c9"/>
+            {[0,90,180,270].map(a => <g key={a} transform={`rotate(${a})`}>
+              <path d="M0 -22L4 0H0Z"/><path d="M0 -22L-4 0H0Z" fill="#eee4c9"/></g>)}
+            <text y="-26" textAnchor="middle" stroke="none" fontSize="11">N</text>
+          </g>
+        </svg>
+        <div className="smp-coordinates">45,7124° N · 73,4414° O</div>
+        <p className="smp-folio-copy">À l’est de Montréal, l’île Deslauriers se trouve dans le fleuve Saint-Laurent. Les goélands à bec cerclé y viennent nicher.</p>
+        <small>Contour géographique · <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a></small>
+      </aside>}
     </figure>
   );
 }
