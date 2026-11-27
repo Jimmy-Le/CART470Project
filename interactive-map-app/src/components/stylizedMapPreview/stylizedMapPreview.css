@@ -49,10 +49,10 @@
   pointer-events: none;
 }
 .smp-labels text {
-  font: 600 14px 'Segoe UI', sans-serif;
+  font: 500 13px Georgia, serif;
   fill: var(--smp-ink);
   stroke: var(--smp-context);
-  stroke-width: 1.6;
+  stroke-width: 1.1;
   stroke-opacity: 0.9;
   paint-order: stroke fill;
   stroke-linejoin: round;
@@ -112,3 +112,9 @@
   right: 12px;
   margin: 0;
 }
+
+.smp-camera { transition: transform 850ms cubic-bezier(.35, 0, .15, 1); }
+.smp-land[role="button"] { cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .smp-camera { transition: none; } }
+.smp-map .smp-land[role="button"]:focus { outline: none; }
+.smp-map .smp-land[role="button"]:focus-visible { stroke: #254c50; stroke-width: 2.5; }
