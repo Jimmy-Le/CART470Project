@@ -153,3 +153,6 @@
 .smp-labels--sinking .smp-overview-name { opacity: 0; }
 .smp-zooming .smp-camera { transition: none !important; }
 .smp-zooming .smp-labels { visibility: hidden; }
+
+.smp-outline-blend { pointer-events: none; animation: smp-outline-fade 260ms ease-out both; }
+@keyframes smp-outline-fade { from { opacity: 1; } to { opacity: 0; } }

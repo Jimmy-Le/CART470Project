@@ -39,6 +39,13 @@ export default function StylizedMapPreview({
   const [phase, setPhase] = useState('visible');
   const [fontReady, setFontReady] = useState(false);
   const timer = useRef(null);
+  const [returnDetail, setReturnDetail] = useState(null);
+  const [fadeOutline, setFadeOutline] = useState(false);
+  const detailRef = useRef(.5);
+  function finishReturn() {
+    setReturnDetail(null);
+    setFadeOutline(false);
+  }
   const destination = useRef(null);
   useEffect(() => {
     let active = true;
@@ -62,6 +69,7 @@ export default function StylizedMapPreview({
     const point = (x, y) => new DOMPoint(x, y).matrixTransform(svg.getScreenCTM().inverse());
     function zoomAt(from, to, factor) {
       clearTimeout(timer.current);
+      finishReturn();
       let prev = gestureCamera.current;
       if (!prev) {
         const matrix = new DOMMatrix(getComputedStyle(cameraRef.current).transform);
@@ -142,6 +150,7 @@ export default function StylizedMapPreview({
     if (gestureCamera.current) setFocused(gestureCamera.current);
     svgRef.current?.classList.remove('smp-zooming');
     gestureCamera.current = null;
+    finishReturn();
     destination.current = id;
     clearTimeout(timer.current);
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -151,21 +160,32 @@ export default function StylizedMapPreview({
     }
     setPhase('sinking');
     timer.current = setTimeout(() => {
+      if (!next && detailRef.current < .5) setReturnDetail(detailRef.current);
       setPhase('hidden');
       setFocused(next);
       timer.current = setTimeout(() => setPhase('visible'), 850);
     }, 230);
   }
-  // Prepare the SVG paths once, unless the map data changes.
-  const map = useMemo(() => {
-    if (!islands.features.length) return null;
+  const zoomLevel = focused?.zoom ?? 1;
+  const detail = zoomLevel <= 2 ? .5 : zoomLevel <= 8 ? .125 : zoomLevel <= 32 ? .03 : 0;
+  const geometryAt = useMemo(() => {
+    if (!islands.features.length) return () => null;
     const project = fitProjection(islands.features, WIDTH, HEIGHT);
-    const records = mapRecords(islands.features, project);
-    return {
-      records,
-      waterPaths: water.features.map(feature => geometryPath(feature.geometry, project)),
+    const cache = new Map();
+    return tolerance => {
+      if (!cache.has(tolerance)) {
+        cache.set(tolerance, {
+          records: mapRecords(islands.features, project, tolerance),
+          waterPaths: water.features.map(f => geometryPath(f.geometry, project, tolerance)),
+        });
+      }
+      return cache.get(tolerance);
     };
   }, [islands, water]);
+  const renderedDetail = returnDetail !== null && !fadeOutline ? returnDetail : detail;
+  detailRef.current = renderedDetail;
+  const map = geometryAt(renderedDetail);
+  const previousMap = fadeOutline && returnDetail !== null ? geometryAt(returnDetail) : null;
 
   const labels = useMemo(() => map && showLabels ? visibleLabels(map.records, focused?.zoom ?? 1, focused?.id) : [], [map, showLabels, focused, fontReady]);
   if (!map) return <div className="smp-map smp-empty">No map data available.</div>;
@@ -190,9 +210,18 @@ export default function StylizedMapPreview({
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="group" aria-label="Map of the Hochelaga Archipelago">
         {/* Draw the water first, then put the islands on top. */}
         <rect className="smp-context" width={WIDTH} height={HEIGHT} />
-        <g ref={cameraRef} className="smp-camera" style={{ transition: focused?.manual ? "none" : undefined, transform: `translate(${dx}px, ${dy}px) scale(${zoom})` }}>
+        <g ref={cameraRef} onTransitionEnd={event => {
+          if (returnDetail !== null && event.target === event.currentTarget && event.propertyName === 'transform') setFadeOutline(true);
+        }} className="smp-camera" style={{ transition: focused?.manual ? "none" : undefined, transform: `translate(${dx}px, ${dy}px) scale(${zoom})` }}>
           <StylizedWaterLayer paths={map.waterPaths} />
           <StylizedIslandLayer islands={map.records} onSelect={selectIsland} />
+          {previousMap && <g className="smp-outline-blend" aria-hidden="true" pointerEvents="none"
+            onAnimationEnd={event => { if (event.target === event.currentTarget) finishReturn(); }}>
+            <rect className="smp-context" width={WIDTH} height={HEIGHT} />
+            <StylizedWaterLayer paths={previousMap.waterPaths} />
+            {previousMap.records.map(island => <path key={island.id} d={island.path}
+              fillRule="evenodd" className="smp-land" style={{pointerEvents:'none'}} vectorEffect="non-scaling-stroke" />)}
+          </g>}
         </g>
         <g className={`smp-labels smp-labels--${phase}`} aria-hidden="true">
           {labels.filter(({anchor: [x, y]}) =>

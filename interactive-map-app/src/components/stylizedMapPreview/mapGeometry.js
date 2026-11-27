@@ -40,20 +40,44 @@ export function fitProjection(features, width, height, padding = 90) {
   ];
 }
 
-// M starts a shape, L connects the points, and Z closes the ring.
-export function geometryPath(geometry, project) {
-  return polygons(geometry).map(polygon =>
-    polygon.map(ring =>
-      ring.map((point, index) => {
-        const [x, y] = project(point);
-        return `${index === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`;
-      }).join('') + 'Z'
-    ).join('')
-  ).join('');
+// Keep vertices whose distance to a replacement segment exceeds the map-space tolerance.
+function simplifyRing(points, tolerance) {
+  if (!tolerance || points.length < 6) return points;
+  const last = points.length - 1;
+  const keep = new Uint8Array(points.length);
+  keep[0] = keep[last] = 1;
+  const segments = [[0, last]];
+  while (segments.length) {
+    const [a, b] = segments.pop();
+    const [x, y] = points[a];
+    const dx = points[b][0] - x, dy = points[b][1] - y;
+    const length2 = dx * dx + dy * dy;
+    let limit = tolerance * tolerance, pivot = -1;
+    for (let i = a + 1; i < b; i++) {
+      const px = points[i][0] - x, py = points[i][1] - y;
+      const t = length2 ? Math.max(0, Math.min(1, (px * dx + py * dy) / length2)) : 0;
+      const distance = (px - t * dx) ** 2 + (py - t * dy) ** 2;
+      if (distance > limit) { limit = distance; pivot = i; }
+    }
+    if (pivot >= 0) {
+      keep[pivot] = 1;
+      segments.push([a, pivot], [pivot, b]);
+    }
+  }
+  const result = points.filter((_, i) => keep[i]);
+  return result.length >= 4 ? result : points;
+}
+
+export function geometryPath(geometry, project, tolerance = 0) {
+  return polygons(geometry).map(polygon => polygon.map(ring =>
+    simplifyRing(ring.map(project), tolerance).map(([x, y], i) =>
+      `${i ? 'L' : 'M'}${x.toFixed(2)},${y.toFixed(2)}`
+    ).join('') + 'Z'
+  ).join('')).join('');
 }
 
 // Each island already has an ID, name and reference point in the GeoJSON.
-export function mapRecords(features, project) {
+export function mapRecords(features, project, tolerance = 0) {
   return features.map(feature => {
     const { projectIslandId, projectName, referenceLon, referenceLat } = feature.properties;
     const anchor = Number.isFinite(referenceLon) && Number.isFinite(referenceLat)
@@ -63,7 +87,7 @@ export function mapRecords(features, project) {
     return {
       id: projectIslandId,
       name: projectName,
-      path: geometryPath(feature.geometry, project),
+      path: geometryPath(feature.geometry, project, tolerance),
       anchor,
     };
   });
