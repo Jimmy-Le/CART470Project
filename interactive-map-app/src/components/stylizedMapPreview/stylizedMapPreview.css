@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English&display=swap');
 /* Change the map colors here. */
 .smp-page, .smp-map {
   --smp-context: #E7DFC5;
@@ -118,3 +119,20 @@
 @media (prefers-reduced-motion: reduce) { .smp-camera { transition: none; } }
 .smp-map .smp-land[role="button"]:focus { outline: none; }
 .smp-map .smp-land[role="button"]:focus-visible { stroke: #254c50; stroke-width: 2.5; }
+
+.smp-island-title {
+  display: flex; align-items: center; justify-content: center; height: 100%;
+  color: #354d49; font: 400 15px/1.3 'IM Fell English', Palatino, Georgia, serif;
+  text-shadow: 0 0 2px #faf2d8, 0 1px 1px #faf2d8;
+}
+.smp-island-title span {
+  transition: opacity 360ms ease var(--delay), transform 440ms ease-out var(--delay);
+}
+.smp-labels--sinking span, .smp-labels--hidden span {
+  opacity: 0; transform: translateY(3px) rotate(var(--tilt));
+  transition-duration: 140ms;
+}
+.smp-labels--hidden { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .smp-island-title span { transition: none; }
+}
