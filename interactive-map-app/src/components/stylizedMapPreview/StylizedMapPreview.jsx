@@ -79,8 +79,8 @@ export default function StylizedMapPreview({
       const ratio = zoom / prev.zoom;
       const camera = {
         id: destination.current, manual: true, zoom,
-        dx: Math.max(WIDTH * (1 - zoom), Math.min(0, to.x - (from.x - prev.dx) * ratio)),
-        dy: Math.max(HEIGHT * (1 - zoom), Math.min(0, to.y - (from.y - prev.dy) * ratio)),
+        dx: Math.max(WIDTH * (.7 - zoom), Math.min(WIDTH * .3, to.x - (from.x - prev.dx) * ratio)),
+        dy: Math.max(HEIGHT * (.7 - zoom), Math.min(HEIGHT * .3, to.y - (from.y - prev.dy) * ratio)),
       };
       gestureCamera.current = camera;
       svg.classList.add('smp-zooming');
@@ -107,30 +107,46 @@ export default function StylizedMapPreview({
       const [a,b] = touches.values();
       return { center: point((a.x+b.x)/2, (a.y+b.y)/2), span: Math.hypot(a.x-b.x,a.y-b.y) };
     }
+    let dragging = false;
     function down(e) {
-      if (e.pointerType !== 'touch') return;
+      if (e.button !== 0 || touches.size >= 2) return;
+      if (!touches.size) blockClick.current = 0;
       touches.set(e.pointerId, {x:e.clientX, y:e.clientY});
       if (touches.size === 2) {
+        dragging = true;
         for (const id of touches.keys()) svg.setPointerCapture(id);
         blockClick.current = Infinity;
       }
     }
     function move(e) {
-      if (!touches.has(e.pointerId)) return;
+      const previous = touches.get(e.pointerId);
+      if (!previous) return;
+      const next = {x:e.clientX, y:e.clientY};
+      if (!dragging) {
+        if (Math.hypot(next.x - previous.x, next.y - previous.y) < 6) return;
+        dragging = true;
+        svg.setPointerCapture(e.pointerId);
+        blockClick.current = Infinity;
+      }
       const before = touches.size === 2 && pair();
-      touches.set(e.pointerId, {x:e.clientX, y:e.clientY});
-      if (before && before.span > 0) {
+      touches.set(e.pointerId, next);
+      if (before) {
         const after = pair();
-        zoomAt(before.center, after.center, after.span / before.span);
+        if (before.span && after.span) zoomAt(before.center, after.center, after.span / before.span);
+      } else {
+        zoomAt(point(previous.x, previous.y), point(next.x, next.y), 1);
       }
     }
     function up(e) {
-      touches.delete(e.pointerId);
-      if (!touches.size && blockClick.current === Infinity) blockClick.current = performance.now() + 300;
+      if (!touches.delete(e.pointerId)) return;
+      if (!touches.size && dragging) {
+        dragging = false;
+        blockClick.current = performance.now() + 300;
+      }
     }
     svg.addEventListener('wheel', wheel, {passive:false});
     svg.addEventListener('pointerdown', down);
-    svg.addEventListener('pointermove', move);
+    window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
     window.addEventListener('pointercancel', up);
     return () => {
@@ -138,7 +154,7 @@ export default function StylizedMapPreview({
       clearTimeout(settle);
       svg.removeEventListener('wheel', wheel);
       svg.removeEventListener('pointerdown', down);
-      svg.removeEventListener('pointermove', move);
+      window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
       window.removeEventListener('pointercancel', up);
     };
