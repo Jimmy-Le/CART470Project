@@ -48,9 +48,100 @@ export default function StylizedMapPreview({
     return () => { active = false; clearTimeout(timer.current); };
   }, []);
 
+  const svgRef = useRef(null);
+  const cameraRef = useRef(null);
+  const gestureCamera = useRef(null);
+  const blockClick = useRef(0);
+  const hasMap = Boolean(islands.features.length);
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const touches = new Map();
+    let frame = 0;
+    let settle;
+    const point = (x, y) => new DOMPoint(x, y).matrixTransform(svg.getScreenCTM().inverse());
+    function zoomAt(from, to, factor) {
+      clearTimeout(timer.current);
+      let prev = gestureCamera.current;
+      if (!prev) {
+        const matrix = new DOMMatrix(getComputedStyle(cameraRef.current).transform);
+        prev = { zoom: matrix.a, dx: matrix.e, dy: matrix.f };
+      }
+      const zoom = Math.max(1, Math.min(2048, prev.zoom * factor));
+      const ratio = zoom / prev.zoom;
+      const camera = {
+        id: destination.current, manual: true, zoom,
+        dx: Math.max(WIDTH * (1 - zoom), Math.min(0, to.x - (from.x - prev.dx) * ratio)),
+        dy: Math.max(HEIGHT * (1 - zoom), Math.min(0, to.y - (from.y - prev.dy) * ratio)),
+      };
+      gestureCamera.current = camera;
+      svg.classList.add('smp-zooming');
+      if (!frame) frame = requestAnimationFrame(() => {
+        frame = 0;
+        const latest = gestureCamera.current;
+        if (latest) cameraRef.current.style.transform = `translate(${latest.dx}px, ${latest.dy}px) scale(${latest.zoom})`;
+      });
+      clearTimeout(settle);
+      settle = setTimeout(() => {
+        if (!gestureCamera.current) return;
+        setFocused(gestureCamera.current);
+        setPhase('visible');
+        svg.classList.remove('smp-zooming');
+      }, 120);
+    }
+    function wheel(e) {
+      e.preventDefault();
+      const anchor = point(e.clientX, e.clientY);
+      const pixels = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? svg.clientHeight : 1);
+      zoomAt(anchor, anchor, Math.exp(-pixels * (e.ctrlKey ? .012 : .002)));
+    }
+    function pair() {
+      const [a,b] = touches.values();
+      return { center: point((a.x+b.x)/2, (a.y+b.y)/2), span: Math.hypot(a.x-b.x,a.y-b.y) };
+    }
+    function down(e) {
+      if (e.pointerType !== 'touch') return;
+      touches.set(e.pointerId, {x:e.clientX, y:e.clientY});
+      if (touches.size === 2) {
+        for (const id of touches.keys()) svg.setPointerCapture(id);
+        blockClick.current = Infinity;
+      }
+    }
+    function move(e) {
+      if (!touches.has(e.pointerId)) return;
+      const before = touches.size === 2 && pair();
+      touches.set(e.pointerId, {x:e.clientX, y:e.clientY});
+      if (before && before.span > 0) {
+        const after = pair();
+        zoomAt(before.center, after.center, after.span / before.span);
+      }
+    }
+    function up(e) {
+      touches.delete(e.pointerId);
+      if (!touches.size && blockClick.current === Infinity) blockClick.current = performance.now() + 300;
+    }
+    svg.addEventListener('wheel', wheel, {passive:false});
+    svg.addEventListener('pointerdown', down);
+    svg.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(settle);
+      svg.removeEventListener('wheel', wheel);
+      svg.removeEventListener('pointerdown', down);
+      svg.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+    };
+  }, [hasMap]);
+
   function moveTo(next) {
     const id = next?.id ?? null;
-    if (destination.current === id) return;
+    if (destination.current === id && !gestureCamera.current && !next) return;
+    if (gestureCamera.current) setFocused(gestureCamera.current);
+    svgRef.current?.classList.remove('smp-zooming');
+    gestureCamera.current = null;
     destination.current = id;
     clearTimeout(timer.current);
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -94,23 +185,31 @@ export default function StylizedMapPreview({
   }
   return (
     <figure className={`smp-map ${presentationOnly ? 'smp-map--presentation' : ''} ${className}`}>
-      <svg onClick={event => { if (!event.target.closest("[data-island-id]")) moveTo(null); }}
+      <svg ref={svgRef} onClickCapture={e => { if (performance.now() < blockClick.current) e.stopPropagation(); }} onClick={event => { if (!event.target.closest("[data-island-id]")) moveTo(null); }}
         onKeyDown={event => { if (event.key === "Escape") moveTo(null); }}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="group" aria-label="Map of the Hochelaga Archipelago">
         {/* Draw the water first, then put the islands on top. */}
         <rect className="smp-context" width={WIDTH} height={HEIGHT} />
-        <g className="smp-camera" style={{ transform: `translate(${dx}px, ${dy}px) scale(${zoom})` }}>
+        <g ref={cameraRef} className="smp-camera" style={{ transition: focused?.manual ? "none" : undefined, transform: `translate(${dx}px, ${dy}px) scale(${zoom})` }}>
           <StylizedWaterLayer paths={map.waterPaths} />
           <StylizedIslandLayer islands={map.records} onSelect={selectIsland} />
         </g>
         <g className={`smp-labels smp-labels--${phase}`} aria-hidden="true">
-          {labels.map(island => (
-            <foreignObject key={island.id} x={dx + zoom * island.anchor[0] - 160}
-              y={dy + zoom * island.anchor[1] - 16} width="320" height="32">
-              <div className="smp-island-title">
+          {labels.filter(({anchor: [x, y]}) =>
+            Math.abs(dx + zoom*x - WIDTH/2) < WIDTH/2 + 300 &&
+            Math.abs(dy + zoom*y - HEIGHT/2) < HEIGHT/2 + 90
+          ).map(island => island.id !== focused?.id ? (
+            <text className="smp-overview-name" key={island.id}
+              x={dx + zoom * island.anchor[0]} y={dy + zoom * island.anchor[1]}
+              textAnchor="middle" dominantBaseline="central">{island.name}</text>
+          ) : (
+            <foreignObject key={island.id} x={dx + zoom * island.anchor[0] - 300}
+              y={dy + zoom * island.anchor[1] - 45} width="600" height="90">
+              <div className={"smp-island-title" + (island.id === focused?.id ? " selected" : "")}>
                 {[...island.name].map((letter, i) => (
-                  <span key={i} style={{ '--delay': Math.min(i * 9, 90) + 'ms',
-                    '--tilt': (i % 2 ? 5 : -5) + 'deg' }}>
+                  <span key={i} style={{ '--delay': Math.round(900 * Math.abs(Math.sin(i * 17.91 + island.name.length))) + 'ms',
+                    '--arch': (-.35 * Math.sin(i / Math.max(1, island.name.length - 1) * Math.PI) + .06 * Math.sin(i * 1.73)) + 'em',
+                    '--tilt': (-6 * Math.cos(i / Math.max(1, island.name.length - 1) * Math.PI) + 3 * Math.sin(i * 3.46)) + 'deg' }}>
                     {letter === ' ' ? '\u00a0' : letter}
                   </span>
                 ))}

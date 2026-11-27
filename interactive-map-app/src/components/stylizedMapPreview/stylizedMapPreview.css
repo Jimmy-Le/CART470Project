@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English&display=swap');
+@font-face { font-family: 'IM Fell English'; src: url('./IMFeENrm28P.ttf') format('truetype'); font-display: swap; }
 /* Change the map colors here. */
 .smp-page, .smp-map {
   --smp-context: #E7DFC5;
@@ -125,14 +125,31 @@
   color: #354d49; font: 400 15px/1.3 'IM Fell English', Palatino, Georgia, serif;
   text-shadow: 0 0 2px #faf2d8, 0 1px 1px #faf2d8;
 }
+
+.smp-map > svg { touch-action: none; }
+.smp-island-title.selected { font-size: 38px; }
 .smp-island-title span {
-  transition: opacity 360ms ease var(--delay), transform 440ms ease-out var(--delay);
+  display: inline-block; white-space: pre;
+  transform: translateY(var(--arch)) rotate(var(--tilt));
 }
-.smp-labels--sinking span, .smp-labels--hidden span {
-  opacity: 0; transform: translateY(3px) rotate(var(--tilt));
-  transition-duration: 140ms;
+@property --smp-opening { syntax: '<percentage>'; inherits: false; initial-value: 145%; }
+.smp-labels--visible span {
+  animation: smp-surface 2s ease-in-out var(--delay) backwards;
 }
+@keyframes smp-surface {
+  from { --smp-opening: 0%; opacity: 0; filter: blur(2.4px); }
+  to { --smp-opening: 145%; opacity: 1; filter: blur(0); }
+  from, to { mask-image: radial-gradient(ellipse at center, black max(0%, calc(var(--smp-opening) - 22%)), transparent max(.1%, var(--smp-opening))); }
+}
+.smp-labels--sinking span { opacity: 0; filter: blur(2px); transition: opacity 220ms, filter 220ms; }
 .smp-labels--hidden { visibility: hidden; }
-@media (prefers-reduced-motion: reduce) {
-  .smp-island-title span { transition: none; }
+@media (prefers-reduced-motion: reduce) { .smp-labels--visible span { animation: none; } }
+
+.smp-labels .smp-overview-name {
+  font: 400 15px 'IM Fell English', Palatino, Georgia, serif;
+  fill: #354d49;
+  transition: opacity 220ms ease;
 }
+.smp-labels--sinking .smp-overview-name { opacity: 0; }
+.smp-zooming .smp-camera { transition: none !important; }
+.smp-zooming .smp-labels { visibility: hidden; }
