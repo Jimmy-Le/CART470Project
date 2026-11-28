@@ -12,6 +12,10 @@ const waterData = JSON.parse(waterSource);
 const WIDTH = 1400;
 const HEIGHT = 900;
 
+function titleScale(zoom, baseline) {
+  return Math.max(.32, Math.min(1.8, (zoom / baseline) ** .45));
+}
+
 function visibleLabels(records, zoom, selectedId) {
   const occupied = [];
   const priority = ['montreal', 'jesus', 'bizard', 'sainte-helene'];
@@ -67,6 +71,7 @@ export default function StylizedMapPreview({
 
   const svgRef = useRef(null);
   const cameraRef = useRef(null);
+  const focusZoom = useRef(1);
   const gestureCamera = useRef(null);
   const blockClick = useRef(0);
   const hasMap = Boolean(islands.features.length);
@@ -76,10 +81,14 @@ export default function StylizedMapPreview({
     const touches = new Map();
     let frame = 0;
     let settle;
-    const point = (x, y) => new DOMPoint(x, y).matrixTransform(svg.getScreenCTM().inverse());
+    let inverse;
+    function point(x, y) {
+      inverse ??= svg.getScreenCTM().inverse();
+      return new DOMPoint(x, y).matrixTransform(inverse);
+    }
     function zoomAt(from, to, factor) {
       clearTimeout(timer.current);
-      finishReturn();
+      if (!svg.classList.contains("smp-zooming")) finishReturn();
       let prev = gestureCamera.current;
       if (!prev) {
         const matrix = new DOMMatrix(getComputedStyle(cameraRef.current).transform);
@@ -95,9 +104,18 @@ export default function StylizedMapPreview({
       gestureCamera.current = camera;
       svg.classList.add('smp-zooming');
       if (!frame) frame = requestAnimationFrame(() => {
+        inverse = null;
         frame = 0;
         const latest = gestureCamera.current;
         if (latest) cameraRef.current.style.transform = `translate(${latest.dx}px, ${latest.dy}px) scale(${latest.zoom})`;
+        if (!latest) return;
+        for (const label of svg.querySelectorAll('[data-label-x]')) {
+          const x = latest.dx + latest.zoom * Number(label.dataset.labelX);
+          const y = latest.dy + latest.zoom * Number(label.dataset.labelY);
+          label.setAttribute('transform', label.dataset.selected
+            ? `translate(${x} ${y}) scale(${titleScale(latest.zoom, focusZoom.current)})`
+            : `translate(${x} ${y})`);
+        }
       });
       clearTimeout(settle);
       settle = setTimeout(() => {
@@ -108,6 +126,7 @@ export default function StylizedMapPreview({
       }, 120);
     }
     function wheel(e) {
+      if (!frame) inverse = null;
       e.preventDefault();
       const anchor = point(e.clientX, e.clientY);
       const pixels = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? svg.clientHeight : 1);
@@ -119,6 +138,7 @@ export default function StylizedMapPreview({
     }
     let dragging = false;
     function down(e) {
+      inverse = null;
       if (e.button !== 0 || touches.size >= 2) return;
       if (!touches.size) blockClick.current = 0;
       touches.set(e.pointerId, {x:e.clientX, y:e.clientY});
@@ -215,6 +235,17 @@ export default function StylizedMapPreview({
   const previousMap = fadeOutline && returnDetail !== null ? geometryAt(returnDetail) : null;
 
   const labels = useMemo(() => map && showLabels ? visibleLabels(map.records, focused?.zoom ?? 1, focused?.id) : [], [map, showLabels, focused, fontReady]);
+  const feature = folioOpen && islands.features.find(f => f.properties.projectIslandId === 'deslauriers');
+  const plate = useMemo(() => {
+    if (!feature) return null;
+    const project = fitProjection([feature], 340, 220, 77);
+    return {
+      coast: geometryPath(feature.geometry, project),
+      water: water.features.map(f => geometryPath(f.geometry, project, .8)).join(''),
+      land: islands.features.filter(f => f !== feature).map(f => geometryPath(f.geometry, project, .8)).join('')
+    };
+  }, [feature, islands, water]);
+  const coast = plate?.coast;
   if (!map) return <div className="smp-map smp-empty">No map data available.</div>;
 
   const zoom = focused?.zoom ?? 1;
@@ -222,9 +253,9 @@ export default function StylizedMapPreview({
   const dy = focused?.dy ?? 0;
 
 
-  const feature = folioOpen && islands.features.find(f => f.properties.projectIslandId === 'deslauriers');
   function selectIsland(id, bounds) {
     const zoom = Math.min(2048, 0.62 * Math.min(WIDTH / bounds.width, HEIGHT / bounds.height));
+    focusZoom.current = zoom;
     moveTo({
       id, zoom,
       dx: WIDTH / 2 - (bounds.x + bounds.width / 2) * zoom,
@@ -254,16 +285,16 @@ export default function StylizedMapPreview({
           </g>}
         </g>
         <g className={`smp-labels smp-labels--${phase}`} aria-hidden="true">
-          {labels.filter(({anchor: [x, y]}) =>
-            Math.abs(dx + zoom*x - WIDTH/2) < WIDTH/2 + 300 &&
-            Math.abs(dy + zoom*y - HEIGHT/2) < HEIGHT/2 + 90
-          ).map(island => island.id !== focused?.id ? (
+          {labels.map(island => <g key={island.id} data-label-x={island.anchor[0]} data-label-y={island.anchor[1]}
+            data-selected={island.id === focused?.id || undefined}
+            transform={`translate(${dx + zoom*island.anchor[0]} ${dy + zoom*island.anchor[1]}) scale(${island.id === focused?.id ? titleScale(zoom, focusZoom.current) : 1})`}>
+            {island.id !== focused?.id ? (
             <text className="smp-overview-name" key={island.id}
-              x={dx + zoom * island.anchor[0]} y={dy + zoom * island.anchor[1]}
+              x="0" y="0"
               textAnchor="middle" dominantBaseline="central">{island.name}</text>
           ) : (
-            <foreignObject key={island.id} x={dx + zoom * island.anchor[0] - 300}
-              y={dy + zoom * island.anchor[1] - 45} width="600" height="90">
+            <foreignObject key={island.id} x="-300"
+              y="-45" width="600" height="90">
               <div className={"smp-island-title" + (island.id === focused?.id ? " selected" : "")}>
                 {[...island.name].map((letter, i) => (
                   <span key={i} style={{ '--delay': Math.round(900 * Math.abs(Math.sin(i * 17.91 + island.name.length))) + 'ms',
@@ -274,7 +305,7 @@ export default function StylizedMapPreview({
                 ))}
               </div>
             </foreignObject>
-          ))}
+          )}</g>)}
         </g>
       </svg>
 
@@ -292,12 +323,27 @@ export default function StylizedMapPreview({
             <rect width="5" height="5" fill="#c3bd91"/><path d="M0 0V5" stroke="#696949" strokeWidth=".9"/>
           </pattern></defs>
           <rect x="2" y="2" width="336" height="216" fill="#e7dcc0" stroke="#a49b78"/>
-          <g stroke="#8b7259" strokeWidth=".6" opacity=".42">
+          <svg x="3" y="3" width="334" height="214" viewBox="3 3 334 214" overflow="hidden">
+            <path d={plate.water} fill="#cbd6c5" fillRule="evenodd" stroke="#a5ad96" strokeWidth=".65"/>
+            <path d={plate.land} fill="#dfd5b6" stroke="#939779" strokeWidth=".8"/>
+          </svg>
+          <g stroke="#8b7259" strokeWidth=".6" opacity=".20">
             {[0,22.5,45,67.5,90,112.5,135,157.5].map(a =>
               <path key={a} d="M-450 0H450" transform={`translate(50 48) rotate(${a})`}/>)}
           </g>
-          <path d={geometryPath(feature.geometry, fitProjection([feature],340,220,45))} fill="url(#smp-hatch)" stroke="#4a513d" strokeWidth="1.6"/>
-          <g transform="translate(50 48)" fill="#884d37" stroke="#884d37" strokeWidth=".7">
+          <g fill="none" strokeLinejoin="round">
+            <path d={coast} stroke="#b8baa1" strokeWidth="12"/>
+            <path d={coast} stroke="#e7dcc0" strokeWidth="10"/>
+            <path d={coast} stroke="#b4b397" strokeWidth="6"/>
+            <path d={coast} stroke="#e7dcc0" strokeWidth="4"/>
+          </g>
+          <g transform="translate(25 172)" fill="#f3ead2" stroke="#615c49" strokeWidth="1" strokeLinejoin="round" aria-hidden="true">
+            <path d="M2 14Q15 12 22 11Q34 9 42 4Q46 0 50 3L57 6L50 7Q47 16 36 19Q25 22 12 16L4 18Z"/>
+            <path d="M9 14Q25 9 40 9Q30 17 20 16ZM14 14L29 12M18 15L31 13M30 20L29 25L24 26M35 20L34 24L38 25" fill="none"/>
+            <circle cx="48" cy="4" r=".8"/><path d="M53 5L53 6.5"/>
+          </g>
+          <path d={coast} fill="url(#smp-hatch)" stroke="#4a513d" strokeWidth="1.6"/>
+          <g transform="translate(50 48) scale(.8)" fill="#884d37" stroke="#884d37" strokeWidth=".7">
             <circle r="14" fill="#eee4c9"/>
             {[0,90,180,270].map(a => <g key={a} transform={`rotate(${a})`}>
               <path d="M0 -22L4 0H0Z"/><path d="M0 -22L-4 0H0Z" fill="#eee4c9"/></g>)}
@@ -306,8 +352,8 @@ export default function StylizedMapPreview({
         </svg>
         <div className="smp-coordinates">45,7124° N · 73,4414° O</div>
         <p className="smp-folio-copy">À l’est de Montréal, l’île Deslauriers se trouve dans le fleuve Saint-Laurent. Les goélands à bec cerclé y viennent nicher.</p>
-        <small>Contour géographique · <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a></small>
       </aside>}
+      <a className="smp-map-credit" href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>
     </figure>
   );
 }
