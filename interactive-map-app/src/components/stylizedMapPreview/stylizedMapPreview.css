@@ -216,3 +216,6 @@
 
 @font-face { font-family:Allura; src:url('./Allura-Regular.ttf') format('truetype'); font-display:swap; }
 .smp-folio .smp-script { font:15px Allura, cursive; fill:#49382c; stroke:#eee4cf; stroke-width:1.3px; paint-order:stroke; }
+
+/* Fade the whole label layer while any in-progress letter reveal continues. */
+.smp-labels.smp-departing { opacity:0; transition:opacity 200ms ease-out; animation:none; }

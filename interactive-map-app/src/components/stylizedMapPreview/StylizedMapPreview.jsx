@@ -246,9 +246,15 @@ export default function StylizedMapPreview({
     const nearby = Math.abs(Math.log2(ratio)) < .22 &&
       Math.hypot(shiftX / WIDTH, shiftY / HEIGHT) < .10;
     const gentleFocus = nearby && id === 'montreal';
-    const quiet = nearby && !gentleFocus;
+    const switchingIsland = Boolean(id && destination.current && id !== destination.current);
+    const quiet = nearby && !gentleFocus && !switchingIsland;
     if (gentleFocus) next = { ...next, gentleFocus: true };
-    setArrival(quiet ? 'quiet' : !next || ratio < .8 ? 'overview' : 'island');
+    const nextArrival = switchingIsland ? 'island' : quiet ? 'quiet' : !next || ratio < .8 ? 'overview' : 'island';
+    function commitSelection(camera) {
+      focusZoom.current = camera?.zoom ?? 1;
+      setArrival(nextArrival);
+      setFocused(camera);
+    }
     if (gestureCamera.current) setFocused(gestureCamera.current);
     svgRef.current?.classList.remove('smp-zooming');
     gestureCamera.current = null;
@@ -256,13 +262,12 @@ export default function StylizedMapPreview({
     destination.current = id;
     clearTimeout(timer.current);
     if (quiet && next) {
-      focusZoom.current = current.a;
-      setFocused({ ...next, zoom: current.a, dx: current.e, dy: current.f });
+      commitSelection({ ...next, zoom: current.a, dx: current.e, dy: current.f });
       setPhase('visible');
       return;
     }
     if (quiet || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setFocused(next);
+      commitSelection(next);
       setPhase('visible');
       return;
     }
@@ -270,8 +275,8 @@ export default function StylizedMapPreview({
     timer.current = setTimeout(() => {
       if (!next && detailRef.current < .5) setReturnDetail(detailRef.current);
       setPhase('hidden');
-      setFocused(next);
-    }, 100);
+      commitSelection(next);
+    }, 210);
   }
   const zoomLevel = focused?.zoom ?? 1;
   const detail = zoomLevel <= 2 ? .5 : zoomLevel <= 8 ? .125 : zoomLevel <= 32 ? .03 : 0;
@@ -349,20 +354,50 @@ export default function StylizedMapPreview({
     const polygons = feature.geometry.type === 'Polygon' ? [feature.geometry.coordinates] : feature.geometry.coordinates;
     for (const polygon of polygons) {
       const ring = polygon[0].map(project);
-      let travelled = 0, next = 3, count = 0;
-      for (let i=1; i<ring.length; i++) {
-        const [x,y] = ring[i-1], dx=ring[i][0]-x, dy=ring[i][1]-y;
-        const length = Math.hypot(dx,dy);
-        while (next < travelled+length) {
-          const t=(next-travelled)/length, px=x+t*dx, py=y+t*dy;
-          if (px>170) marks.push(`M${px} ${py}l3 2`);
-          if (++count%5===0) {
-            const offset=px>170 ? 7 : -13;
-            waves.push(`M${px+offset} ${py}q2 -1.8 4 0t4 0m-6 2.5q2 -1 4 0`);
-          }
-          next+=3.1;
+      // Equally spaced samples make the engraving independent of vertex density.
+      const samples = [];
+      let distance = 0, next = 0;
+      let winding = 0;
+      for (let i = 1; i < ring.length; i++) {
+        const [x,y] = ring[i-1], [ex,ey] = ring[i];
+        const dx = ex-x, dy = ey-y, length = Math.hypot(dx,dy);
+        winding += x*ey-ex*y;
+        while (next < distance+length) {
+          const t = (next-distance)/length;
+          samples.push([x+t*dx, y+t*dy]);
+          next += 2.6;
         }
-        travelled+=length;
+        distance += length;
+      }
+      const n = samples.length;
+      if (n < 6) continue;
+      const side = winding >= 0 ? 1 : -1;
+      const points = samples.map(([x,y],i) => {
+        const before = samples[(i+n-2)%n], after = samples[(i+2)%n];
+        const dx = after[0]-before[0], dy = after[1]-before[1];
+        const length = Math.hypot(dx,dy) || 1;
+        return {x,y,nx:side*dy/length,ny:-side*dx/length};
+      });
+      let i = 1;
+      while (i < n-5) {
+        const p = points[i], q = points[i+4];
+        const bend = Math.hypot(q.nx-p.nx,q.ny-p.ny);
+        const count = Math.min(n-i-1, bend > .52 ? 5 : 10);
+        const tone = .5+.5*Math.sin(p.x*.043+p.y*.071);
+        // Little wavelets are placed in the water beside the sampled shore.
+        const reach = 6 + tone*4;
+        const x = p.x + reach*p.nx, y = p.y + reach*p.ny;
+        const width = 2.2 + tone*1.6, lift = 1.1 + Math.min(bend,1);
+        waves.push(`M${x-width*2} ${y}q${width} ${-lift} ${2*width} 0t${2*width} -.3`);
+        if (tone > .22) waves.push(`M${x-2} ${y+2.4}q2 -1.25 4 .1t3.2 -.2`);
+        if (tone > .75) waves.push(`M${x+2} ${y+4.7}q1.6 -.8 3.2 -.2`);
+        if (tone>.48) {
+          points.slice(i,i+Math.min(count,5)).forEach((v,k) => {
+            const depth=1.4+2*Math.sin((k+1)*.55);
+            marks.push(`M${v.x} ${v.y}l${v.nx*depth+v.ny*.8} ${v.ny*depth-v.nx*.8}`);
+          });
+        }
+        i += count+1+Math.round(tone*3);
       }
     }
     return {
@@ -381,8 +416,8 @@ export default function StylizedMapPreview({
 
 
   function selectIsland(id, bounds) {
+    if (id === destination.current) return;
     const zoom = Math.min(2048, 0.62 * Math.min(WIDTH / bounds.width, HEIGHT / bounds.height));
-    focusZoom.current = zoom;
     moveTo({
       id, zoom,
       dx: WIDTH / 2 - (bounds.x + bounds.width / 2) * zoom,
@@ -410,7 +445,7 @@ export default function StylizedMapPreview({
             {previousMap.records.map(island => <path key={island.id} d={island.path}
               fillRule="evenodd" className="smp-land" style={{pointerEvents:'none'}} vectorEffect="non-scaling-stroke" />)}
           </g>}
-        <g className={`smp-labels smp-labels--${phase} smp-arrival-${arrival}`} aria-hidden="true">
+        <g className={`smp-labels smp-labels--${phase === 'sinking' ? 'visible smp-departing' : phase} smp-arrival-${arrival}`} aria-hidden="true">
           {labels.map(island => <g key={island.id} transform={`translate(${island.anchor[0]} ${island.anchor[1]})`}>
             <g data-label-scale="" data-selected={island.id === focused?.id || undefined}
               transform={`scale(${(island.id === focused?.id ? titleScale(zoom, focusZoom.current) : 1) / zoom})`}>
@@ -446,9 +481,7 @@ export default function StylizedMapPreview({
         <h2 id="smp-folio-title">{feature.properties.projectName}</h2>
         {feature.properties.projectIslandId === 'deslauriers' && <i lang="en">Seagull Island</i>}
         <svg viewBox="0 0 340 220" role="img" aria-label={`Carte de ${feature.properties.projectName}`}>
-          <defs><pattern id="smp-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(28)">
-            <rect width="5" height="5" fill="#c3bd91"/><path d="M0 0V5" stroke="#696949" strokeWidth=".9"/>
-          </pattern></defs>
+
           <rect x="2" y="2" width="336" height="216" fill="#e7dcc0" stroke="#a49b78"/>
           <svg x="3" y="3" width="334" height="214" viewBox="3 3 334 214" overflow="hidden">
             <path d={plate.water} fill="#dadcc8" fillRule="evenodd" stroke="#a5ad96" strokeWidth=".65"/>
@@ -461,10 +494,10 @@ export default function StylizedMapPreview({
           <path d="M3 3H337" stroke="#984b3c" strokeWidth="1.4"/>
           <path d={plate.marks} fill="none" stroke="#6e6954" strokeWidth=".65"/>
           <g clipPath="url(#smp-water-clip)" fill="none" stroke="#969b83" opacity=".57">
-            <path d={plate.land} transform="translate(1.6 1.3)" strokeDasharray="6 2 2 5" strokeWidth=".65"/>
-            <path d={plate.land} transform="translate(3 2.8)" strokeDasharray="4 12 7 16" strokeWidth=".45"/>
+            <path d={plate.land} transform="translate(1.6 1.3)" strokeDasharray="24 17 9 33" strokeWidth=".65"/>
+            
           </g>
-          <path d={plate.waves} fill="none" stroke="#748174" strokeWidth=".55" clipPath="url(#smp-water-clip)"/>
+          <path d={plate.waves} fill="none" stroke="#788477" strokeLinecap="round" strokeLinejoin="round" strokeWidth=".65" clipPath="url(#smp-water-clip)"/>
           <defs><clipPath id="smp-water-clip"><path d={plate.water} clipRule="evenodd"/></clipPath></defs>
           {feature.properties.projectIslandId === 'deslauriers' &&
           <g transform="translate(25 172)" fill="#f3ead2" stroke="#615c49" strokeWidth="1" strokeLinejoin="round" aria-hidden="true">
@@ -473,7 +506,7 @@ export default function StylizedMapPreview({
             <circle cx="48" cy="4" r=".8"/><path d="M53 5L53 6.5"/>
             <path d="M17 28q5 -2 10 0t10 0m-14 3q4 -1.5 9 0M23 14l5-2m0 2 5-2" fill="none" strokeWidth=".6"/>
           </g>}
-          <path d={coast} fill="url(#smp-hatch)" stroke="#4a513d" strokeWidth="1.6"/>
+          <path d={coast} fill="#c9c5a2" stroke="#555440" strokeWidth="1.15" strokeLinejoin="round"/>
           <g transform="translate(50 48) scale(.8)" fill="#884d37" stroke="#884d37" strokeWidth=".7">
             <circle r="14" fill="#eee4c9"/>
             {[0,90,180,270].map(a => <g key={a} transform={`rotate(${a})`}>
