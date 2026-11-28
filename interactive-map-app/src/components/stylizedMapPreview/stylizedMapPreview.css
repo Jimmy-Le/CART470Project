@@ -206,3 +206,13 @@
 .smp-labels--visible .smp-neighbour span {
   animation-delay:calc(110ms + var(--delay));
 }
+
+.smp-labels .smp-overview-name { transition:font-size 180ms ease, fill 180ms ease, opacity 100ms ease; }
+.smp-labels .smp-chosen { font-size:19px; fill:#203e39; }
+@media (prefers-reduced-motion:no-preference) {
+  .smp-labels--visible.smp-arrival-overview { animation:smp-ink 220ms ease-out; }
+  .smp-labels--visible.smp-arrival-island .smp-overview-name { animation:smp-ink 220ms 110ms backwards; }
+}
+
+@font-face { font-family:Allura; src:url('./Allura-Regular.ttf') format('truetype'); font-display:swap; }
+.smp-folio .smp-script { font:15px Allura, cursive; fill:#49382c; stroke:#eee4cf; stroke-width:1.3px; paint-order:stroke; }
