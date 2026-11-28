@@ -72,6 +72,18 @@ export default function StylizedMapPreview({
   const svgRef = useRef(null);
   const cameraRef = useRef(null);
   const focusZoom = useRef(1);
+  useEffect(() => {
+    if (phase !== 'hidden') return;
+    let current = true;
+    const frame = requestAnimationFrame(() => {
+      const motion = cameraRef.current?.getAnimations()
+        .find(animation => animation.transitionProperty === 'transform');
+      const reveal = () => { if (current) setPhase('visible'); };
+      if (motion) motion.finished.then(reveal, reveal);
+      else reveal();
+    });
+    return () => { current = false; cancelAnimationFrame(frame); };
+  }, [phase, focused]);
   const gestureCamera = useRef(null);
   const blockClick = useRef(0);
   const hasMap = Boolean(islands.features.length);
@@ -210,8 +222,7 @@ export default function StylizedMapPreview({
       if (!next && detailRef.current < .5) setReturnDetail(detailRef.current);
       setPhase('hidden');
       setFocused(next);
-      timer.current = setTimeout(() => setPhase('visible'), 850);
-    }, 230);
+    }, 100);
   }
   const zoomLevel = focused?.zoom ?? 1;
   const detail = zoomLevel <= 2 ? .5 : zoomLevel <= 8 ? .125 : zoomLevel <= 32 ? .03 : 0;
@@ -297,7 +308,7 @@ export default function StylizedMapPreview({
               y="-45" width="600" height="90">
               <div className={"smp-island-title" + (island.id === focused?.id ? " selected" : "")}>
                 {[...island.name].map((letter, i) => (
-                  <span key={i} style={{ '--delay': Math.round(900 * Math.abs(Math.sin(i * 17.91 + island.name.length))) + 'ms',
+                  <span key={i} style={{ '--delay': i === 0 ? "0ms" : Math.round(240 * Math.abs(Math.sin(i * 17.91 + island.name.length))) + 'ms',
                     '--arch': (-.35 * Math.sin(i / Math.max(1, island.name.length - 1) * Math.PI) + .06 * Math.sin(i * 1.73)) + 'em',
                     '--tilt': (-6 * Math.cos(i / Math.max(1, island.name.length - 1) * Math.PI) + 3 * Math.sin(i * 3.46)) + 'deg' }}>
                     {letter === ' ' ? '\u00a0' : letter}
@@ -353,7 +364,6 @@ export default function StylizedMapPreview({
         <div className="smp-coordinates">45,7124° N · 73,4414° O</div>
         <p className="smp-folio-copy">À l’est de Montréal, l’île Deslauriers se trouve dans le fleuve Saint-Laurent. Les goélands à bec cerclé y viennent nicher.</p>
       </aside>}
-      <a className="smp-map-credit" href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>
     </figure>
   );
 }

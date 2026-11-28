@@ -134,7 +134,7 @@
 }
 @property --smp-opening { syntax: '<percentage>'; inherits: false; initial-value: 145%; }
 .smp-labels--visible span {
-  animation: smp-surface 2s ease-in-out var(--delay) backwards;
+  animation: smp-surface 950ms ease-out var(--delay) backwards;
 }
 @keyframes smp-surface {
   from { --smp-opening: 0%; opacity: 0; filter: blur(2.4px); }
@@ -142,7 +142,7 @@
 }
 .smp-labels--visible span { mask-image: radial-gradient(ellipse at center, black max(0%, calc(var(--smp-opening) - 22%)), transparent max(.1%, var(--smp-opening)));
 }
-.smp-labels--sinking span { opacity: 0; filter: blur(2px); transition: opacity 220ms, filter 220ms; }
+.smp-labels--sinking span { opacity: 0; filter: blur(2px); transition: opacity 100ms, filter 100ms; }
 .smp-labels--hidden { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { .smp-labels--visible span { animation: none; } }
 
