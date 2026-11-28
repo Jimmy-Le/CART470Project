@@ -299,14 +299,16 @@ export default function StylizedMapPreview({
           {labels.map(island => <g key={island.id} data-label-x={island.anchor[0]} data-label-y={island.anchor[1]}
             data-selected={island.id === focused?.id || undefined}
             transform={`translate(${dx + zoom*island.anchor[0]} ${dy + zoom*island.anchor[1]}) scale(${island.id === focused?.id ? titleScale(zoom, focusZoom.current) : 1})`}>
-            {island.id !== focused?.id ? (
+            {island.id !== focused?.id && (focused?.manual ||
+              Math.abs(dx + zoom * island.anchor[0] - WIDTH / 2) > WIDTH / 2 + 100 ||
+              Math.abs(dy + zoom * island.anchor[1] - HEIGHT / 2) > HEIGHT / 2 + 20) ? (
             <text className="smp-overview-name" key={island.id}
               x="0" y="0"
               textAnchor="middle" dominantBaseline="central">{island.name}</text>
           ) : (
             <foreignObject key={island.id} x="-300"
               y="-45" width="600" height="90">
-              <div className={"smp-island-title" + (island.id === focused?.id ? " selected" : "")}>
+              <div className={"smp-island-title" + (island.id === focused?.id ? " selected" : " smp-neighbour")}>
                 {[...island.name].map((letter, i) => (
                   <span key={i} style={{ '--delay': i === 0 ? "0ms" : Math.round(240 * Math.abs(Math.sin(i * 17.91 + island.name.length))) + 'ms',
                     '--arch': (-.35 * Math.sin(i / Math.max(1, island.name.length - 1) * Math.PI) + .06 * Math.sin(i * 1.73)) + 'em',

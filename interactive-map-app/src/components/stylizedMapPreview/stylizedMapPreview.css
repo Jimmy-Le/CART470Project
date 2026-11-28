@@ -200,3 +200,9 @@
   .smp-map > svg {transition:none;}
   .smp-folio,.smp-folio > * {animation:none;}
 }
+
+/* Keep neighbouring place names level, like lettering on a chart. */
+.smp-neighbour span { transform:none; }
+.smp-labels--visible .smp-neighbour span {
+  animation-delay:calc(110ms + var(--delay));
+}
